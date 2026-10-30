@@ -3,7 +3,6 @@
  * No XFS layout, parsing, allocation or relocation code belongs here.
  * Destructive device operations deliberately fail closed in these tests.
  */
-#define _GNU_SOURCE
 #include "ifs_defrag_services_v1.h"
 #include <errno.h>
 #include <limits.h>
@@ -93,6 +92,7 @@ static bool deny_identity_fd(int fd,const char *id,uint64_t n) {
 }
 static LdDevice deny_open(const char *p,bool w) {
     (void)p;(void)w;test_die("device opened outside test fixture");
+    abort();
 }
 static void deny_close(LdDevice *d) { (void)d; }
 static void *test_xcalloc(size_t n,size_t bytes) {
