@@ -9,5 +9,13 @@ static int run(int argc,char **argv,const IfsDefragServicesV1 *services) {
  ifs_unbind_services();
  return result;
 }
-static const IfsXfsModuleV1 api={IFS_XFS_MODULE_V1,sizeof(IfsXfsModuleV1),"xfs",IFS_XFS_CAP_RUN,run};
+int ifs_xfs_fixture_run(const void *,const char *,int,const void *);
+static int fixture(const void *spec,const char *path,int create,
+ const IfsDefragServicesV1 *services,const IfsXfsFixtureHostV1 *host) {
+ if(ifs_bind_services(services)!=0)return -1;
+ int result=ifs_xfs_fixture_run(spec,path,create,host);
+ ifs_unbind_services();
+ return result;
+}
+static const IfsXfsModuleV1 api={IFS_XFS_MODULE_V1,sizeof(IfsXfsModuleV1),"xfs",IFS_XFS_CAP_RUN | IFS_XFS_CAP_FIXTURE,run,fixture};
 const IfsXfsModuleV1 *infiltrator_filesystem_xfs_v1(void){return &api;}
