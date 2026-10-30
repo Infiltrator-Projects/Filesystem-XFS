@@ -36,9 +36,25 @@ if(BUILD_TESTING)
  target_include_directories(xfs-module-test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
  target_link_libraries(xfs-module-test PRIVATE xfs-driver)
  add_test(NAME xfs-module-contract COMMAND xfs-module-test)
- # Native XFS engine and metadata whitebox sources are preserved in tests/.
- # Their host-service test harness requires a separate controlled qualification
- # before those original Defragmenter test targets can be retired.
+ # The canonical filesystem repository, not Defragmenter, owns the native
+ # parser/relayout regressions. Both tests link against this exact XFS.so.
+ add_executable(xfs-native-test tests/test_xfs_native.c)
+ target_include_directories(xfs-native-test PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/native" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
+ target_compile_definitions(xfs-native-test PRIVATE _GNU_SOURCE _FILE_OFFSET_BITS=64)
+ target_compile_options(xfs-native-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
+ target_link_libraries(xfs-native-test PRIVATE xfs-driver)
+ add_test(NAME xfs-native COMMAND xfs-native-test)
+
+ # This test includes the canonical metadata translation unit deliberately to
+ # exercise static B+tree validation without adding test symbols to the ABI.
+ add_executable(xfs-metadata-test tests/test_xfs_metadata_whitebox.c)
+ target_include_directories(xfs-metadata-test PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/native" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
+ target_compile_definitions(xfs-metadata-test PRIVATE _GNU_SOURCE _FILE_OFFSET_BITS=64)
+ target_compile_options(xfs-metadata-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
+ target_link_libraries(xfs-metadata-test PRIVATE xfs-driver)
+ add_test(NAME xfs-metadata COMMAND xfs-metadata-test)
 
 endif()
 install(TARGETS xfs-driver LIBRARY DESTINATION /System/Filesystems)
