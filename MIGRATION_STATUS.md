@@ -1,5 +1,7 @@
-# XFS migration — 2026-10-30
+# XFS shared-object migration — 2026-10-30
 
-Source import only. Existing Defragmenter XFS native analysis/relayout code copied unchanged from Defragmenter commit 30af892d8897d3aeaeefeac1bfcdb9620a0a5c72. Format design is from Filesystems commit ca2fa1210c3c1f2b6f52cd15b3da6dfa83d453ad.
+XFS filesystem analysis, metadata parsing, planning, mutation, and fixture creation are owned by this canonical repository. `XFS.so` is built from `native/`, `module/`, and `fixtures/`. It exports `infiltrator_filesystem_xfs_v1` with run and fixture callbacks. Defragmenter loads it through a filesystem-neutral host, including the test-media path.
 
-The much larger XFS Linux VFS implementation remains in Filesystems/native/filesystems/xfs/linux. These Defragmenter source files depend on Defragmenter's host services and do NOT yet build a standalone XFS.so. The module needs canonical integration, Common ABI adaptation, independent media tests and qualified BOOT/kernel adapters before original sources or consumers can be changed.
+The native regression sources were imported from Defragmenter commit `30af892d8897d3aeaeefeac1bfcdb9620a0a5c72`. The module build now owns `xfs-module-contract`, `xfs-native`, and `xfs-metadata` tests; CI results remain the source of truth for qualification. The native implementation must not also be compiled into Defragmenter.
+
+The separate XFS Linux kernel VFS code remains in the Filesystems repository. Its presence does not imply that BOOT/kernel adapters are fully qualified. Do not claim that live-media writes or crash recovery are qualified without their corresponding independent end-to-end test evidence.
