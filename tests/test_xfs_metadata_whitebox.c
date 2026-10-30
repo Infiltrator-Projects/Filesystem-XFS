@@ -6,6 +6,8 @@
  * test-only symbols in the production ABI.
  */
 #include "../native/xfs_metadata.c"
+#include "xfs_test_host_services.h"
+
 
 #include <stdio.h>
 
@@ -222,6 +224,7 @@ static int test_ag_owner_rmap_regeneration(void) {
 }
 
 int main(void) {
+    xfs_test_bind_services();
     CHECK(test_clean_log_head_detection() == 0);
     CHECK(test_allocation_tree_pool_growth() == 0);
     CHECK(test_ag_owner_rmap_regeneration() == 0);

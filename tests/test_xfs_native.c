@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* Native XFS core tests: C is the authoritative filesystem implementation. */
 #include "xfs_native.h"
+#include "xfs_test_host_services.h"
+
 
 #include <fcntl.h>
 #include <stdint.h>
@@ -230,6 +232,7 @@ static void test_writer_feature_gates(void) {
 }
 
 int main(void) {
+    xfs_test_bind_services();
     test_crc32c();
     test_growth_planner();
     test_payload_relocation();

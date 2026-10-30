@@ -38,12 +38,17 @@ if(BUILD_TESTING)
  add_test(NAME xfs-module-contract COMMAND xfs-module-test)
  # The canonical filesystem repository, not Defragmenter, owns the native
  # parser/relayout regressions. Both tests link against this exact XFS.so.
+ add_library(xfs-test-host STATIC tests/test_host_services.c)
+ target_include_directories(xfs-test-host PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
+ target_compile_definitions(xfs-test-host PRIVATE _GNU_SOURCE _FILE_OFFSET_BITS=64)
+ target_compile_options(xfs-test-host PRIVATE -Wall -Wextra -Wpedantic -Werror)
+ target_link_libraries(xfs-test-host PUBLIC xfs-driver)
  add_executable(xfs-native-test tests/test_xfs_native.c)
  target_include_directories(xfs-native-test PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/native" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
  target_compile_definitions(xfs-native-test PRIVATE _GNU_SOURCE _FILE_OFFSET_BITS=64)
  target_compile_options(xfs-native-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
- target_link_libraries(xfs-native-test PRIVATE xfs-driver InfiltratrCommon::Common SQLite::SQLite3 OpenSSL::Crypto Threads::Threads)
+ target_link_libraries(xfs-native-test PRIVATE xfs-test-host InfiltratrCommon::Common SQLite::SQLite3 OpenSSL::Crypto Threads::Threads)
  add_test(NAME xfs-native COMMAND xfs-native-test)
 
  # This test includes the canonical metadata translation unit deliberately to
@@ -53,7 +58,7 @@ if(BUILD_TESTING)
   "${CMAKE_CURRENT_SOURCE_DIR}/native" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
  target_compile_definitions(xfs-metadata-test PRIVATE _GNU_SOURCE _FILE_OFFSET_BITS=64)
  target_compile_options(xfs-metadata-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
- target_link_libraries(xfs-metadata-test PRIVATE xfs-driver InfiltratrCommon::Common SQLite::SQLite3 OpenSSL::Crypto Threads::Threads)
+ target_link_libraries(xfs-metadata-test PRIVATE xfs-test-host InfiltratrCommon::Common SQLite::SQLite3 OpenSSL::Crypto Threads::Threads)
  add_test(NAME xfs-metadata COMMAND xfs-metadata-test)
 
 endif()
