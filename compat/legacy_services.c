@@ -37,7 +37,9 @@ int ifs_bind_services(const IfsDefragServicesV1 *s) {
         !s->ld_stop_report_ready ||
         !s->ld_die || !s->ld_xstrndup ||
         !s->ld_device_number_is_mounted || !s->ld_fd_matches_identity ||
-        !s->ld_device_open || !s->ld_device_close) {
+        !s->ld_device_open || !s->ld_device_close ||
+        !s->ld_xcalloc || !s->ld_device_try_open ||
+        !s->ld_device_format_identity || !s->ld_device_matches_identity) {
         errno=EINVAL; return -1;
     }
     active=s; return 0;
@@ -89,4 +91,21 @@ LdDevice ld_device_open(const char *path,bool writable) {
 }
 void ld_device_close(LdDevice *p) {
  if(active) active->ld_device_close(p);
+}
+
+void *ld_xcalloc(size_t n,size_t sz) {
+ if(active)return active->ld_xcalloc(n,sz);
+ errno=ENOSYS;return NULL;
+}
+int ld_device_try_open(const char *path,bool writable,LdDevice *d) {
+ if(active)return active->ld_device_try_open(path,writable,d);
+ errno=ENOSYS;return -1;
+}
+int ld_device_format_identity(const LdDevice *d,char *buf,size_t n) {
+ if(active)return active->ld_device_format_identity(d,buf,n);
+ errno=ENOSYS;return -1;
+}
+bool ld_device_matches_identity(const LdDevice *d,const char *id,uint64_t size) {
+ if(active)return active->ld_device_matches_identity(d,id,size);
+ errno=ENOSYS;return false;
 }

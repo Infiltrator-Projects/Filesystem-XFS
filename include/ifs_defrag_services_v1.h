@@ -43,5 +43,10 @@ typedef struct {
     bool (*ld_fd_matches_identity)(int, const char *, uint64_t);
     LdDevice (*ld_device_open)(const char *, bool);
     void (*ld_device_close)(LdDevice *);
+    /* Appended filesystem-neutral XFS safety and allocation callbacks. */
+    void *(*ld_xcalloc)(size_t,size_t);
+    int (*ld_device_try_open)(const char *, bool, LdDevice *);
+    int (*ld_device_format_identity)(const LdDevice *, char *, size_t);
+    bool (*ld_device_matches_identity)(const LdDevice *, const char *, uint64_t);
 } IfsDefragServicesV1;
 #endif
