@@ -43,7 +43,7 @@ if(BUILD_TESTING)
   "${CMAKE_CURRENT_SOURCE_DIR}/native" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
  target_compile_definitions(xfs-native-test PRIVATE _GNU_SOURCE _FILE_OFFSET_BITS=64)
  target_compile_options(xfs-native-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
- target_link_libraries(xfs-native-test PRIVATE xfs-driver)
+ target_link_libraries(xfs-native-test PRIVATE xfs-driver InfiltratrCommon::Common SQLite::SQLite3 OpenSSL::Crypto Threads::Threads)
  add_test(NAME xfs-native COMMAND xfs-native-test)
 
  # This test includes the canonical metadata translation unit deliberately to
@@ -53,7 +53,7 @@ if(BUILD_TESTING)
   "${CMAKE_CURRENT_SOURCE_DIR}/native" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
  target_compile_definitions(xfs-metadata-test PRIVATE _GNU_SOURCE _FILE_OFFSET_BITS=64)
  target_compile_options(xfs-metadata-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
- target_link_libraries(xfs-metadata-test PRIVATE xfs-driver)
+ target_link_libraries(xfs-metadata-test PRIVATE xfs-driver InfiltratrCommon::Common SQLite::SQLite3 OpenSSL::Crypto Threads::Threads)
  add_test(NAME xfs-metadata COMMAND xfs-metadata-test)
 
 endif()
