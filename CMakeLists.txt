@@ -63,3 +63,6 @@ if(BUILD_TESTING)
 
 endif()
 install(TARGETS xfs-driver LIBRARY DESTINATION /System/Filesystems)
+# Install only this filesystem's illustrated PDF beside its native shared object.
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/docs/XFS.pdf"
+        DESTINATION /System/Resources/Documentation/Filesystem-XFS)
