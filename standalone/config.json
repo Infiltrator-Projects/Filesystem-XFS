@@ -1,0 +1,7 @@
+{
+  "repository": "Filesystem-XFS",
+  "module": "XFS.so",
+  "pdf": "docs/XFS.pdf",
+  "abi": "infiltrator_filesystem_xfs_v1",
+  "build_system": "cmake"
+}
