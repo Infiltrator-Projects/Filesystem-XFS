@@ -50,6 +50,29 @@ static void test_crc32c(void) {
     CHECK((~crc) == UINT32_C(0xe3069283));
 }
 
+static void test_crc_bounds(void) {
+    uint8_t block[16];
+    uint8_t baseline[16];
+    memset(block, 0xa5, sizeof(block));
+    memcpy(baseline, block, sizeof(block));
+
+    /* No out-of-bounds writes for truncated, overflowing or NULL fields. */
+    xfs_write_crc_le(block, sizeof(block), sizeof(block) - 3U);
+    CHECK(memcmp(block, baseline, sizeof(block)) == 0);
+    xfs_write_crc_le(block, sizeof(block), SIZE_MAX);
+    CHECK(memcmp(block, baseline, sizeof(block)) == 0);
+    xfs_write_crc_le(NULL, sizeof(block), 0U);
+    CHECK(xfs_crc_field(NULL, sizeof(block), 0U) == 0U);
+
+    /* The last valid checksum field is written little-endian. */
+    uint32_t crc = xfs_crc_field(block, sizeof(block), sizeof(block) - 4U);
+    xfs_write_crc_le(block, sizeof(block), sizeof(block) - 4U);
+    CHECK(memcmp(block, baseline, sizeof(block) - 4U) == 0);
+    uint32_t stored = (uint32_t)block[12] | ((uint32_t)block[13] << 8U) |
+                      ((uint32_t)block[14] << 16U) | ((uint32_t)block[15] << 24U);
+    CHECK(stored == crc);
+}
+
 static void test_growth_planner(void) {
     XfsCatalogue catalogue = make_catalogue(90U, 10U);
     XfsPlan plan;
@@ -234,6 +257,7 @@ static void test_writer_feature_gates(void) {
 int main(void) {
     xfs_test_bind_services();
     test_crc32c();
+    test_crc_bounds();
     test_growth_planner();
     test_payload_relocation();
     test_payload_checkpoint_boundary();
