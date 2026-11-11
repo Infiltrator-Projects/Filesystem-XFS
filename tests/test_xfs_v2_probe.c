@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 extern const IfsFsModuleApiV2 *infiltrator_filesystem_api_v2(void);
+/* Canonical CRC implementation in the source-owned XFS engine. */
+extern void xfs_write_crc_le(uint8_t *data,size_t length,size_t field);
 static uint8_t disk[1048576];
 static int reader(void *ctx,uint64_t at,void *out,uint32_t n){
     (void)ctx;
@@ -37,6 +39,14 @@ int main(void){
     be16(disk+106,16);disk[120]=12;disk[121]=9;
     disk[122]=8;disk[123]=4;disk[124]=7;
     CHECK(core->probe(&h,&variant)==IFS_FS_OK && variant==4);
+    /* The canonical native CRC writer is the oracle for a 4-KiB
+     * version-5 superblock, not a duplicate test-only checksum parser. */
+    be16(disk+100,5);be16(disk+102,4096);
+    xfs_write_crc_le(disk,4096u,224u);
+    CHECK(core->probe(&h,&variant)==IFS_FS_OK && variant==5);
+    disk[1024]^=1u;variant=0;
+    CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
+    disk[1024]^=1u;be16(disk+100,4);be16(disk+102,512);
     be64(disk+8,UINT64_MAX);variant=0;
     CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
     be64(disk+8,256);disk[0]=0;

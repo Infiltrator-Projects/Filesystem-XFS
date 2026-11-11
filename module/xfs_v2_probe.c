@@ -55,9 +55,31 @@ static int probe(const IfsFsHostRuntimeV2 *h, uint32_t *variant)
        sb[123]>=63u ||
        (UINT64_C(1)<<sb[123])!=xfs_be16(sb+106))
         goto done;
-    /* XFS v5 superblocks require the canonical CRC field at byte 224. */
-    if(version==5u && le32(sb+224)!=xfs_crc_field(sb,512u,224u))
-        goto done;
+    /* XFS v5 CRC covers the entire on-disk superblock sector, which
+     * can be 4096 bytes rather than the first 512-byte identity record. */
+    if(version==5u) {
+        const uint32_t disk_sector=xfs_be16(sb+102);
+        if(disk_sector>span) {
+            uint8_t *expanded;
+            if(disk_sector>h->volume_bytes) goto done;
+            expanded=h->allocate(h->context,disk_sector);
+            if(!expanded) {
+                result=IFS_FS_NO_MEMORY;
+                goto done;
+            }
+            for(off=0u;off<disk_sector;off+=sector)
+                if(h->read_at(h->context,off,expanded+off,sector)) {
+                    h->release(h->context,expanded);
+                    result=IFS_FS_IO_ERROR;
+                    goto done;
+                }
+            h->release(h->context,sb);
+            sb=expanded;
+            span=disk_sector;
+        }
+        if(le32(sb+224)!=xfs_crc_field(sb,disk_sector,224u))
+            goto done;
+    }
     *variant=version;
     result=IFS_FS_OK;
 done:
