@@ -19,3 +19,11 @@ v5 superblock CRC validation. The existing native V1 operations remain
 until complete V2 namespace, analysis and mutation parity is qualified;
 V2 does **not** advertise those operations yet. Both interfaces are
 required during the transition to avoid losing existing functionality.
+
+## 1.0.9 qualification correction
+
+The Common V2 XFS v5 superblock checksum now covers its complete on-disk
+sector (including 4096-byte sectors), with damaged-media regression tests.
+The immutable 1.0.9 release is source-identified, and native release jobs
+refuse a tag pointing to a different commit. Existing V1 consumer operations
+remain available while their V2 equivalents are qualified.

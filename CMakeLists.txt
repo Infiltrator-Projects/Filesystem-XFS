@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-project(FilesystemXFS VERSION 1.0.0 LANGUAGES C)
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" FILESYSTEM_VERSION LIMIT_COUNT 1)
+project(FilesystemXFS VERSION ${FILESYSTEM_VERSION} LANGUAGES C)
 include(CTest)
 include(FetchContent)
 find_package(OpenSSL REQUIRED)
@@ -16,7 +17,7 @@ FetchContent_MakeAvailable(infiltratr_common)
 # Common is a link-time dependency; its development files must not be installed
 # by this standalone filesystem package.
 set_property(DIRECTORY "${infiltratr_common_SOURCE_DIR}" PROPERTY EXCLUDE_FROM_ALL TRUE)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "#define LD_VERSION \"1.0.0\"\n")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "#define LD_VERSION \"${PROJECT_VERSION}\"\n")
 add_library(xfs-driver SHARED
  native/xfs_catalog.c native/xfs_common.c native/xfs_plan.c
  native/xfs_metadata.c native/xfs_worker.c

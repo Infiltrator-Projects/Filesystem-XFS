@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: filesystem-xfs-native-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   qualify:
     runs-on: ubuntu-24.04
@@ -130,9 +133,19 @@ jobs:
           test "$(find dist -maxdepth 1 -type f -name '*.deb' | wc -l)" = 1
           test "$(find dist -maxdepth 1 -type f -name '*.run' | wc -l)" = 1
           if gh release view "$tag" --json tagName >/dev/null 2>&1; then
-            echo "Existing immutable release $tag retained"
+            existing=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')
+            if [ "$existing" != "$GITHUB_SHA" ]; then
+              echo "::error::Existing immutable $tag points to $existing, not $GITHUB_SHA. Advance VERSION." >&2
+              exit 1
+            fi
+            echo "Exact-source immutable release $tag retained"
             exit 0
           fi
           gh release create "$tag" dist/*.deb dist/*.run dist/*.ko --target "$GITHUB_SHA" \
             --title "Independent filesystem native and portable installers $version" \
             --notes "Portable DEB contains the shared object, generated manual and Linux 6.12.107 adapter. The source-embedded RUN compiles the shared object and Linux adapter locally, generates the manual and installs all three regular files. InfiltratorOS checks and repairs its outputs independently."
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')" = "$GITHUB_SHA"
+          downloaded="$(mktemp -d)"
+          trap 'rm -rf "$downloaded"' EXIT
+          gh release download "$tag" --dir "$downloaded"
+          diff -qr dist "$downloaded"
