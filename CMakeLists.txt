@@ -11,7 +11,7 @@ set(INFILTRATR_COMMON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(INFILTRATR_COMMON_BUILD_SHARED OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(infiltratr_common
  GIT_REPOSITORY https://github.com/Infiltrator-Projects/Libraries.git
- GIT_TAG c76ec95ef66fc728df6a906ad75a6a4dd63b419b)
+ GIT_TAG 5b5fb95988c8d0b53ed29fdecfb0b70274182fd6)
 FetchContent_MakeAvailable(infiltratr_common)
 # Common is a link-time dependency; its development files must not be installed
 # by this standalone filesystem package.
@@ -20,7 +20,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "#define LD_VERSION \"1.0.0\"
 add_library(xfs-driver SHARED
  native/xfs_catalog.c native/xfs_common.c native/xfs_plan.c
  native/xfs_metadata.c native/xfs_worker.c
- compat/legacy_services.c compat/runtime_alloc.c module/xfs_module.c
+ compat/legacy_services.c compat/runtime_alloc.c module/xfs_module.c module/xfs_v2_probe.c
  fixtures/xfs_codec.c module/xfs_fixture_bridge.c)
 set_source_files_properties(native/xfs_worker.c PROPERTIES
  COMPILE_DEFINITIONS "main=ifs_xfs_worker_main")
@@ -32,13 +32,19 @@ target_compile_options(xfs-driver PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_link_options(xfs-driver PRIVATE -Wl,-z,defs)
 target_include_directories(xfs-driver PRIVATE
  "${CMAKE_CURRENT_SOURCE_DIR}/native" "${CMAKE_CURRENT_SOURCE_DIR}/compat"
- "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/include" "${CMAKE_CURRENT_BINARY_DIR}")
+ "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/include" "${CMAKE_CURRENT_BINARY_DIR}"
+ "${infiltratr_common_SOURCE_DIR}/include")
 target_link_libraries(xfs-driver PRIVATE InfiltratrCommon::Common OpenSSL::Crypto SQLite::SQLite3 Threads::Threads)
 if(BUILD_TESTING)
  add_executable(xfs-module-test tests/test_module.c)
  target_include_directories(xfs-module-test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
  target_link_libraries(xfs-module-test PRIVATE xfs-driver)
  add_test(NAME xfs-module-contract COMMAND xfs-module-test)
+ add_executable(xfs-v2-probe-test tests/test_xfs_v2_probe.c)
+ target_include_directories(xfs-v2-probe-test PRIVATE "${infiltratr_common_SOURCE_DIR}/include")
+ target_link_libraries(xfs-v2-probe-test PRIVATE xfs-driver InfiltratrCommon::Common)
+ target_compile_options(xfs-v2-probe-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
+ add_test(NAME xfs-common-v2-probe COMMAND xfs-v2-probe-test)
  # The canonical filesystem repository, not Defragmenter, owns the native
  # parser/relayout regressions. Both tests link against this exact XFS.so.
  add_library(xfs-test-host STATIC tests/test_host_services.c)
