@@ -13,13 +13,16 @@ static uint32_t le32(const uint8_t *p)
 { return (uint32_t)p[0] | ((uint32_t)p[1]<<8) |
          ((uint32_t)p[2]<<16) | ((uint32_t)p[3]<<24); }
 
-static int probe(const IfsFsHostRuntimeV2 *h, uint32_t *variant)
+static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
+                   IfsFsVolumeInfoV2 *volume)
 {
     uint8_t *sb;
     uint32_t span, sector, block, agblocks, agcount, off, version;
-    uint64_t dblocks;
+    uint64_t dblocks,free_blocks;
     int result=IFS_FS_CORRUPT;
-    if (!variant || !ifs_fs_host_v2_valid(h)) return IFS_FS_INVALID;
+    if (!variant)return IFS_FS_INVALID;
+    *variant=0u;
+    if(!ifs_fs_host_v2_valid(h))return IFS_FS_INVALID;
     sector=h->logical_sector_bytes;
     if (h->volume_bytes<512u || sector>h->volume_bytes)
         return IFS_FS_NOT_FOUND;
@@ -39,11 +42,13 @@ static int probe(const IfsFsHostRuntimeV2 *h, uint32_t *variant)
     }
     block=xfs_be32(sb+4);
     dblocks=xfs_be64(sb+8);
+    free_blocks=xfs_be64(sb+144);
     agblocks=xfs_be32(sb+84);
     agcount=xfs_be32(sb+88);
     version=(uint32_t)(xfs_be16(sb+100)&0x000fu);
     if(block<512u || block>65536u || (block&(block-1u)) ||
-       block<sector || !dblocks || dblocks>h->volume_bytes/block ||
+       block<sector || !dblocks || free_blocks>dblocks ||
+       dblocks>h->volume_bytes/block ||
        !agblocks || !agcount || dblocks<=(uint64_t)agblocks*(agcount-1u) ||
        dblocks>(uint64_t)agblocks*agcount ||
        (version!=4u && version!=5u) ||
@@ -81,27 +86,92 @@ static int probe(const IfsFsHostRuntimeV2 *h, uint32_t *variant)
             goto done;
     }
     *variant=version;
+    if(volume) {
+        *volume=(IfsFsVolumeInfoV2){
+            .structure_bytes=sizeof(*volume),.variant=version,
+            .max_name_bytes=255u,.block_bytes=block,
+            .total_bytes=dblocks*block,
+            .free_bytes=free_blocks*block
+        };
+    }
     result=IFS_FS_OK;
 done:
     h->release(h->context,sb);
     return result;
 }
+static int probe(const IfsFsHostRuntimeV2 *h,uint32_t *variant)
+{ return inspect(h,variant,NULL); }
+
+/* Read-only Common V2 session: the canonical XFS metadata decoder validated
+ * feature flags and geometry; this reports the superblock's RECORDED free
+ * block count, not an independently scanned block bitmap. The host alone
+ * owns media I/O and writable access is always rejected. */
+static struct {
+    uintptr_t generation,active;
+    IfsFsVolumeInfoV2 info;
+} session;
+static int mounted(void *handle)
+{ return session.active && (uintptr_t)handle==session.active; }
+static int mount_volume(const IfsFsHostRuntimeV2 *h, void **volume,
+                        IfsFsVolumeInfoV2 *info)
+{
+    IfsFsVolumeInfoV2 measured={0};
+    uint32_t variant=0u;
+    int rc;
+    if(!volume || !info || info->structure_bytes<sizeof(*info))
+        return IFS_FS_INVALID;
+    *volume=NULL;
+    if(!ifs_fs_host_v2_valid(h))return IFS_FS_INVALID;
+    if(!(h->capabilities & IFS_FS_HOST_READ_ONLY))return IFS_FS_ACCESS;
+    if(session.active || session.generation==UINTPTR_MAX)return IFS_FS_BUSY;
+    rc=inspect(h,&variant,&measured);
+    if(rc!=IFS_FS_OK)return rc;
+    session.info=measured;
+    session.active=++session.generation;
+    *info=measured;
+    *volume=(void *)session.active;
+    return IFS_FS_OK;
+}
+static int unmount_volume(void *volume)
+{
+    if(!mounted(volume))return IFS_FS_INVALID;
+    session.active=0u;
+    session.info=(IfsFsVolumeInfoV2){0};
+    return IFS_FS_OK;
+}
+static int query_volume(void *volume,IfsFsVolumeInfoV2 *info)
+{
+    if(!mounted(volume) || !info ||
+       info->structure_bytes<sizeof(*info))return IFS_FS_INVALID;
+    *info=session.info;
+    return IFS_FS_OK;
+}
+static const IfsFsVolumeOpsV2 volume_ops={
+    .header={IFS_FS_GROUP_ABI_V2,sizeof(IfsFsVolumeOpsV2),
+             IFS_FS_GROUP_VOLUME,0u,IFS_FS_VOLUME_QUERY},
+    .query=query_volume
+};
 static const IfsFsCoreOpsV2 core={
     .header={IFS_FS_GROUP_ABI_V2,sizeof(IfsFsCoreOpsV2),
-             IFS_FS_GROUP_CORE,0u,IFS_FS_CORE_PROBE},
-    .probe=probe
+             IFS_FS_GROUP_CORE,0u,IFS_FS_CORE_PROBE|IFS_FS_CORE_MOUNT},
+    .probe=probe,
+    .mount=mount_volume,
+    .unmount=unmount_volume
 };
 static const IfsFsGroupHeaderV2 *query(uint32_t group,uint32_t lo,uint32_t hi)
 {
-    return group==IFS_FS_GROUP_CORE && lo<=IFS_FS_GROUP_ABI_V2 &&
-           hi>=IFS_FS_GROUP_ABI_V2 ? &core.header:NULL;
+    if(lo>IFS_FS_GROUP_ABI_V2 || hi<IFS_FS_GROUP_ABI_V2)return NULL;
+    if(group==IFS_FS_GROUP_CORE)return &core.header;
+    if(group==IFS_FS_GROUP_VOLUME)return &volume_ops.header;
+    return NULL;
 }
 static const IfsFsModuleApiV2 api={
     .abi_version=IFS_FS_COMMON_ABI_V2,
     .structure_bytes=sizeof(IfsFsModuleApiV2),
     .format_id="xfs",
     .runtime_profiles=IFS_FS_PROFILE_HOSTED,
-    .group_mask=IFS_FS_GROUP_BIT(IFS_FS_GROUP_CORE),
+    .group_mask=IFS_FS_GROUP_BIT(IFS_FS_GROUP_CORE)|
+                IFS_FS_GROUP_BIT(IFS_FS_GROUP_VOLUME),
     .query_group=query
 };
 __attribute__((visibility("default")))
