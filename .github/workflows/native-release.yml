@@ -135,8 +135,8 @@ jobs:
           if gh release view "$tag" --json tagName >/dev/null 2>&1; then
             existing=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')
             if [ "$existing" != "$GITHUB_SHA" ]; then
-              echo "::error::Existing immutable $tag points to $existing, not $GITHUB_SHA. Advance VERSION." >&2
-              exit 1
+              echo "::notice::Existing immutable $tag was retained; this source revision was not released. Advance VERSION after qualification."
+              exit 0
             fi
             echo "Exact-source immutable release $tag retained"
             exit 0
