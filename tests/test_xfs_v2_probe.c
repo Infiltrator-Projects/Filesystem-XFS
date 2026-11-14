@@ -67,7 +67,15 @@ int main(void){
     CHECK(core->probe(&h,&variant)==IFS_FS_OK && variant==5);
     disk[1024]^=1u;variant=0;
     CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
-    disk[1024]^=1u;be16(disk+100,4);be16(disk+102,512);
+    disk[1024]^=1u;
+    /* Malformed non-power-of-two disk sectors must be rejected before the
+     * CRC reader allocates a too-small buffer for an aligned host read. */
+    const uint16_t invalid_sectors[]={513u,1023u,4095u};
+    for (size_t i=0;i<sizeof(invalid_sectors)/sizeof(invalid_sectors[0]);++i) {
+        be16(disk+102,invalid_sectors[i]);variant=0;
+        CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
+    }
+    be16(disk+100,4);be16(disk+102,512);
     be64(disk+8,UINT64_MAX);variant=0;
     CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
     be64(disk+8,256);disk[0]=0;

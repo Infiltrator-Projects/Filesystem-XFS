@@ -53,6 +53,7 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
        dblocks>(uint64_t)agblocks*agcount ||
        (version!=4u && version!=5u) ||
        xfs_be16(sb+102)<512u || xfs_be16(sb+102)>block ||
+       (xfs_be16(sb+102)&(xfs_be16(sb+102)-1u)) ||
        xfs_be16(sb+104)<256u || xfs_be16(sb+104)>block ||
        (xfs_be16(sb+104)&(xfs_be16(sb+104)-1u)) ||
        xfs_be16(sb+106)!=block/xfs_be16(sb+104) ||
