@@ -49,13 +49,20 @@ int main(void){
     CHECK(core->mount(&h,&mounted,&info)==IFS_FS_OK && mounted);
     CHECK(info.variant==4u && info.block_bytes==4096u &&
           info.total_bytes==sizeof(disk) && info.free_bytes==409600u);
-    CHECK(core->mount(&h,&old,&info)==IFS_FS_BUSY && !old);
+    CHECK(core->mount(&h,&old,&info)==IFS_FS_OK && old && old!=mounted);
     info.structure_bytes=sizeof(info);
     CHECK(vol->query(mounted,&info)==IFS_FS_OK);
-    old=mounted;
     CHECK(core->unmount(mounted)==IFS_FS_OK);
-    CHECK(core->unmount(old)==IFS_FS_INVALID);
+    CHECK(core->unmount(mounted)==IFS_FS_INVALID);
+    CHECK(vol->query(mounted,&info)==IFS_FS_INVALID);
+    info.structure_bytes=sizeof(info);
+    CHECK(vol->query(old,&info)==IFS_FS_OK);
+    CHECK(core->unmount(old)==IFS_FS_OK);
     CHECK(vol->query(old,&info)==IFS_FS_INVALID);
+    info.structure_bytes=sizeof(info);
+    CHECK(core->mount(&h,&mounted,&info)==IFS_FS_OK && mounted!=old);
+    CHECK(vol->query(old,&info)==IFS_FS_INVALID);
+    CHECK(core->unmount(mounted)==IFS_FS_OK);
     be64(disk+144,257u);
     info.structure_bytes=sizeof(info);
     CHECK(core->mount(&h,&mounted,&info)==IFS_FS_CORRUPT && !mounted);
