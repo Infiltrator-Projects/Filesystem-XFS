@@ -5,6 +5,10 @@
  */
 #include <infiltratr/filesystem_module_v2.h>
 #include <infiltratr/filesystem_ro_sessions_v2.h>
+/* Strict Common V2 identity is retained even with native LTO and GC. */
+__attribute__((used, retain, section(".ifsmeta")))
+static const char ifs_xfs_v2_identity[] = "IFS-MODULE:xfs:common2";
+
 #include "xfs_native.h"
 #include <stddef.h>
 #include <stdint.h>

@@ -1,12 +1,15 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-#include "ifs_xfs_module_v1.h"
+#include <infiltratr/filesystem_module_v2.h>
 #include <stdio.h>
-#include <string.h>
-int main(void) {
- const IfsXfsModuleV1 *a=infiltrator_filesystem_xfs_v1();
- if(!a || a->abi_version!=IFS_XFS_MODULE_V1 ||
-    a->structure_bytes<sizeof(*a) || !a->format_id ||
-    strcmp(a->format_id,"xfs") || a->capabilities!=(IFS_XFS_CAP_RUN | IFS_XFS_CAP_FIXTURE) ||
-    !a->run || !a->fixture) { fputs("XFS.so ABI invalid\n",stderr);return 1; }
- return 0;
+extern const IfsFsModuleApiV2 *infiltrator_filesystem_api_v2(void);
+int main(void)
+{
+    const IfsFsModuleApiV2 *api=infiltrator_filesystem_api_v2();
+    if (!ifs_fs_api_v2_valid(api,"xfs") ||
+        api->runtime_profiles != IFS_FS_PROFILE_HOSTED ||
+        !ifs_fs_group_v2(api,IFS_FS_GROUP_CORE)) {
+        fputs("XFS.so does not expose the required Common V2 descriptor\n", stderr);
+        return 1;
+    }
+    return 0;
 }

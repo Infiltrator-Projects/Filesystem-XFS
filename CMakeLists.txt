@@ -21,7 +21,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "#define LD_VERSION \"${PROJE
 add_library(xfs-driver SHARED
  native/xfs_catalog.c native/xfs_common.c native/xfs_plan.c
  native/xfs_metadata.c native/xfs_worker.c
- compat/legacy_services.c compat/runtime_alloc.c module/xfs_module.c module/xfs_v2_probe.c
+ compat/legacy_services.c compat/runtime_alloc.c module/xfs_v2_probe.c
  fixtures/xfs_codec.c module/xfs_fixture_bridge.c)
 set_source_files_properties(native/xfs_worker.c PROPERTIES
  COMPILE_DEFINITIONS "main=ifs_xfs_worker_main")
@@ -38,14 +38,16 @@ target_include_directories(xfs-driver PRIVATE
 target_link_libraries(xfs-driver PRIVATE InfiltratrCommon::Common OpenSSL::Crypto SQLite::SQLite3 Threads::Threads)
 if(BUILD_TESTING)
  add_executable(xfs-module-test tests/test_module.c)
- target_include_directories(xfs-module-test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/compat")
- target_link_libraries(xfs-module-test PRIVATE xfs-driver)
+ target_include_directories(xfs-module-test PRIVATE "${infiltratr_common_SOURCE_DIR}/include")
+ target_link_libraries(xfs-module-test PRIVATE xfs-driver InfiltratrCommon::Common)
  add_test(NAME xfs-module-contract COMMAND xfs-module-test)
  add_executable(xfs-v2-probe-test tests/test_xfs_v2_probe.c)
  target_include_directories(xfs-v2-probe-test PRIVATE "${infiltratr_common_SOURCE_DIR}/include")
  target_link_libraries(xfs-v2-probe-test PRIVATE xfs-driver InfiltratrCommon::Common)
  target_compile_options(xfs-v2-probe-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
  add_test(NAME xfs-common-v2-probe COMMAND xfs-v2-probe-test)
+ add_test(NAME xfs-v2-only-dynamic-export
+  COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_v2_exports.sh" "$<TARGET_FILE:xfs-driver>")
  # The canonical filesystem repository, not Defragmenter, owns the native
  # parser/relayout regressions. Both tests link against this exact XFS.so.
  add_library(xfs-test-host STATIC tests/test_host_services.c)
