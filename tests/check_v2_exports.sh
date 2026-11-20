@@ -1,8 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # SPDX-License-Identifier: GPL-3.0-or-later
-set -euo pipefail
+set -eu
 so=${1:?XFS.so required}
 test -s "$so"
+# Independent callers invoke this script with sh; do not assume Bash.
+# Check nm itself before verifying its output through portable pipelines.
+nm -D --defined-only "$so" >/dev/null
 test "$(nm -D --defined-only "$so" |
   awk '$3=="infiltrator_filesystem_api_v2"{n++}END{print n+0}')" -eq 1
 other="$(nm -D --defined-only "$so" | awk '{print $3}' |
