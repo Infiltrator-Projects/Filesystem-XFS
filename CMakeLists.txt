@@ -80,7 +80,7 @@ if(BUILD_TESTING)
    -Wall -Wextra -Wpedantic -Werror)
  add_test(NAME xfs-common-v2-probe COMMAND xfs-v2-probe-test)
  add_test(NAME xfs-v2-only-dynamic-export
-   COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_v2_exports.sh"
+   COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_v2_exports.sh"
      "$<TARGET_FILE:xfs-driver>")
 
  add_library(xfs-test-host STATIC tests/test_host_services.c)
