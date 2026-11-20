@@ -1,19 +1,15 @@
-# XFS shared-object migration — 2026-10-30
+# XFS Common V2 migration status
 
-XFS filesystem analysis, metadata parsing, planning, mutation, and fixture creation are owned by this canonical repository. `XFS.so` is built from `native/`, `module/`, and `fixtures/`. It supplies the format-specific run and fixture callbacks. Defragmenter loads it through a filesystem-neutral host, including the test-media path.
+The XFS production shared object contains only the native endian/CRC32C
+superblock decoder and Common V2 probe, read-only metadata mount sessions
+and volume information. The native checksum and geometry logic are unchanged.
+Historical XFS AG btree/parser/relayout, worker and fixture source is built
+in **noninstalled regression tests**; it is no longer linked into XFS.so.
+The installed module exports only `infiltrator_filesystem_api_v2`. The .deb
+and source-embedded .run carry only XFS.so and its PDF, without .ko.
 
-The native regression sources were imported from Defragmenter commit `30af892d8897d3aeaeefeac1bfcdb9620a0a5c72`. The module build now owns `xfs-module-contract`, `xfs-native`, and `xfs-metadata` tests; CI results remain the source of truth for qualification. The native implementation must not also be compiled into Defragmenter.
-
-The separate XFS Linux kernel VFS code remains in the Filesystems repository. Its presence does not imply that BOOT/kernel adapters are fully qualified. Do not claim that live-media writes or crash recovery are qualified without their corresponding independent end-to-end test evidence.
-
-## Strict Common V2 read-only XFS volume lifecycle (1.0.10)
-Independent XFS now provides CORE.PROBE, CORE.MOUNT/UNMOUNT and
-VOLUME.QUERY through canonical on-disk superblock decoding over Common V2
-read-only host callbacks. V5 CRC verification checks the source-owned
-full disk sector, while recorded free blocks are range-checked against
-volume size. The free-space number is **recorded metadata**, not a scan
-of free-space Btrees or AG ownership. No UFS or XFS parsing was duplicated
-inside Defragmenter. The independent native XFS analyser and experimental
-writer remain unchanged and no V2 DEFRAG MAP/PLAN/EXECUTE/VERIFY/RECOVER
-is advertised until qualified. Bad CRC/geometry, stale sessions and
-non-readonly mounts fail closed.
+**Not a BOOT-ready reader**. Actual supported-feature checks of the XFS
+allocation groups, inode btrees, directory formats and extent-based file
+reading are not exposed through the Common V2 namespace; no freestanding
+payload, production BOOT validator acceptance or OVMF kernel/initramfs
+handoff is qualified. No new production release is published.

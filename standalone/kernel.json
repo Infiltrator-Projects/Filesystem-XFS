@@ -1,10 +1,1 @@
-{
-  "name": "xfs",
-  "directory": "native/filesystems/xfs/linux",
-  "paths": [
-    "native/filesystems/xfs"
-  ],
-  "make_args": [
-    "CONFIG_XFS_FS=m"
-  ]
-}
+null
