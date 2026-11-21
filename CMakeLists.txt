@@ -71,6 +71,13 @@ if(BUILD_TESTING)
 
  # The independently generated CRC32C fixture uses the historical test
  # library's canonical checksum helper, NOT a new implementation inside Boot.
+ add_executable(xfs-superblock-media tests/test_superblock_media.c)
+ target_include_directories(xfs-superblock-media PRIVATE "${infiltratr_common_SOURCE_DIR}/include")
+ target_compile_options(xfs-superblock-media PRIVATE -Wall -Wextra -Wpedantic -Werror)
+ target_link_libraries(xfs-superblock-media PRIVATE ${CMAKE_DL_LIBS})
+ add_test(NAME xfs-real-superblock-geometry
+   COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/tests/superblock-media.sh"
+     "$<TARGET_FILE:xfs-superblock-media>" "$<TARGET_FILE:xfs-driver>")
  add_executable(xfs-v2-probe-test tests/test_xfs_v2_probe.c)
  target_include_directories(xfs-v2-probe-test PRIVATE
    "${infiltratr_common_SOURCE_DIR}/include")

@@ -69,7 +69,7 @@ int main(void){
     be64(disk+144,100u);
     /* The canonical native CRC writer is the oracle for a 4-KiB
      * version-5 superblock, not a duplicate test-only checksum parser. */
-    be16(disk+100,5);be16(disk+102,4096);
+    be16(disk+100,5);be16(disk+102,4096);disk[121]=12;
     xfs_write_crc_le(disk,4096u,224u);
     CHECK(core->probe(&h,&variant)==IFS_FS_OK && variant==5);
     /* Reject checksum-valid but unsupported v5 metadata formats. */
@@ -92,7 +92,7 @@ int main(void){
         be16(disk+102,invalid_sectors[i]);variant=0;
         CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
     }
-    be16(disk+100,4);be16(disk+102,512);
+    be16(disk+100,4);be16(disk+102,512);disk[121]=9;
     be64(disk+8,UINT64_MAX);variant=0;
     CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
     be64(disk+8,256);disk[0]=0;

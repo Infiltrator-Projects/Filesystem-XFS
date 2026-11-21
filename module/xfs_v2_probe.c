@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
  * Common V2 raw-device probe using the canonical native XFS geometry and
  * checksum helpers. No path, fd, write, or staging operations are exposed.
- * V1 native workers remain available until their V2 replacement qualifies.
+ * Historical analysis and mutation code is compiled only for regression tests.
  */
 #include <infiltratr/filesystem_module_v2.h>
 #include <infiltratr/filesystem_ro_sessions_v2.h>
@@ -51,31 +51,30 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
     agblocks=xfs_be32(sb+84);
     agcount=xfs_be32(sb+88);
     version=(uint32_t)(xfs_be16(sb+100)&0x000fu);
+    const uint16_t disk_sector = xfs_be16(sb+102);
+    const uint16_t inode_size = xfs_be16(sb+104);
+    unsigned ag_shift = 0;
+    if (agblocks)
+        for (uint32_t rest = agblocks - 1; rest; rest >>= 1)
+            ++ag_shift;
     if(block<512u || block>65536u || (block&(block-1u)) ||
-       block<sector || !dblocks || free_blocks>dblocks ||
+       !dblocks || free_blocks>dblocks ||
        dblocks>h->volume_bytes/block ||
        !agblocks || !agcount || dblocks<=(uint64_t)agblocks*(agcount-1u) ||
        dblocks>(uint64_t)agblocks*agcount ||
        (version!=4u && version!=5u) ||
-       xfs_be16(sb+102)<512u || xfs_be16(sb+102)>block ||
-       (xfs_be16(sb+102)&(xfs_be16(sb+102)-1u)) ||
-       xfs_be16(sb+104)<256u || xfs_be16(sb+104)>block ||
-       (xfs_be16(sb+104)&(xfs_be16(sb+104)-1u)) ||
+       sb[121]<9u || sb[121]>15u || disk_sector!=(1u<<sb[121]) ||
+       disk_sector>block || sb[122]<8u || sb[122]>11u ||
+       inode_size!=(1u<<sb[122]) || inode_size>block ||
+       sb[124]!=ag_shift || sb[127]>100u || sb[120]+sb[192]>16u ||
        xfs_be16(sb+106)!=block/xfs_be16(sb+104) ||
        sb[120]>=63u || (UINT64_C(1)<<sb[120])!=block ||
        sb[123]>=63u ||
        (UINT64_C(1)<<sb[123])!=xfs_be16(sb+106))
         goto done;
-    /* The on-disk INPROGRESS bit is set while formatting and must never
-     * identify an incomplete volume as mountable. */
-    if (sb[126u]) {
-        result=IFS_FS_UNSUPPORTED;
-        goto done;
-    }
     /* XFS v5 CRC covers the entire on-disk superblock sector, which
      * can be 4096 bytes rather than the first 512-byte identity record. */
     if(version==5u) {
-        const uint32_t disk_sector=xfs_be16(sb+102);
         if(disk_sector>span) {
             uint8_t *expanded;
             if(disk_sector>h->volume_bytes) goto done;
@@ -84,7 +83,8 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
                 result=IFS_FS_NO_MEMORY;
                 goto done;
             }
-            for(off=0u;off<disk_sector;off+=sector)
+            memcpy(expanded,sb,span);
+            for(off=span;off<disk_sector;off+=sector)
                 if(h->read_at(h->context,off,expanded+off,sector)) {
                     h->release(h->context,expanded);
                     result=IFS_FS_IO_ERROR;
@@ -92,7 +92,6 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
                 }
             h->release(h->context,sb);
             sb=expanded;
-            span=disk_sector;
         }
         if(le32(sb+224)!=xfs_crc_field(sb,disk_sector,224u))
             goto done;
@@ -106,6 +105,12 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
             result=IFS_FS_UNSUPPORTED;
             goto done;
         }
+    }
+    /* The on-disk INPROGRESS bit is set while formatting and must never
+     * identify an incomplete volume as mountable. */
+    if (sb[126u]) {
+        result=IFS_FS_UNSUPPORTED;
+        goto done;
     }
     *variant=version;
     if(volume) {

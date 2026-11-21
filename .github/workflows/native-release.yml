@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends build-essential binutils cmake git pkg-config libssl-dev libsqlite3-dev dpkg-dev
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends build-essential binutils cmake git pkg-config libssl-dev libsqlite3-dev xfsprogs dpkg-dev
       - name: Qualify portable Common V2 package only
         run: |
           set -euo pipefail
@@ -41,6 +41,15 @@ jobs:
           dpkg-deb -x "$deb" "$RUNNER_TEMP/native-root"
           test "$(find "$RUNNER_TEMP/native-root" -type f | wc -l)" = 2
           sh tests/check_v2_exports.sh "$RUNNER_TEMP/native-root/System/Filesystems/XFS.so"
+      - name: Exercise XFS geometry through both installed package binaries
+        run: |
+          set -euo pipefail
+          git clone --quiet https://github.com/Infiltrator-Projects/Libraries "$RUNNER_TEMP/common-xfs"
+          git -C "$RUNNER_TEMP/common-xfs" checkout --quiet d23a52693fd3212368d327e1c1302e07ae9510ec
+          cc -std=c11 -O2 -Wall -Wextra -Wpedantic -Werror -I"$RUNNER_TEMP/common-xfs/include" tests/test_superblock_media.c -ldl -o "$RUNNER_TEMP/test-xfs"
+          for profile in portable native-root; do
+            bash tests/superblock-media.sh "$RUNNER_TEMP/test-xfs" "$RUNNER_TEMP/$profile/System/Filesystems/XFS.so"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: XFS-hosted-V2-not-BOOT-qualified
