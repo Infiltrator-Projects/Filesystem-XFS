@@ -28,12 +28,12 @@ add_custom_command(OUTPUT "${XFS_FIRMWARE_ELF}"
    "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}" "-DCOMMON_INCLUDE_DIR=${infiltratr_common_SOURCE_DIR}/include"
  COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_CURRENT_BINARY_DIR}/firmware"
  DEPENDS module/firmware/CMakeLists.txt module/firmware/runtime.c module/xfs_v2_probe.c
-   native/xfs_disk.c native/xfs_disk.h
+   native/xfs_disk.c native/xfs_disk.h native/xfs_reader.c native/xfs_reader.h
    "${infiltratr_common_SOURCE_DIR}/include/infiltratr/filesystem_module_v2.h"
    "${infiltratr_common_SOURCE_DIR}/include/infiltratr/filesystem_ro_sessions_v2.h"
  VERBATIM)
 add_custom_target(xfs-firmware DEPENDS "${XFS_FIRMWARE_ELF}")
-add_library(xfs-driver SHARED native/xfs_disk.c module/xfs_v2_probe.c)
+add_library(xfs-driver SHARED native/xfs_disk.c native/xfs_reader.c module/xfs_v2_probe.c)
 add_dependencies(xfs-driver xfs-firmware)
 set_property(TARGET xfs-driver APPEND PROPERTY LINK_DEPENDS "${XFS_FIRMWARE_ELF}")
 add_custom_command(TARGET xfs-driver POST_BUILD
@@ -87,6 +87,13 @@ if(BUILD_TESTING)
 
  # The independently generated CRC32C fixture uses the historical test
  # library's canonical checksum helper, NOT a new implementation inside Boot.
+ add_executable(xfs-namespace-media tests/test_namespace_media.c)
+ target_include_directories(xfs-namespace-media PRIVATE "${infiltratr_common_SOURCE_DIR}/include")
+ target_compile_options(xfs-namespace-media PRIVATE -Wall -Wextra -Wpedantic -Werror)
+ target_link_libraries(xfs-namespace-media PRIVATE ${CMAKE_DL_LIBS})
+ add_test(NAME xfs-real-namespace-media
+   COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/tests/namespace-media.sh"
+     "$<TARGET_FILE:xfs-namespace-media>" "$<TARGET_FILE:xfs-driver>" "${XFS_FIRMWARE_ELF}")
  add_executable(xfs-superblock-media tests/test_superblock_media.c)
  target_include_directories(xfs-superblock-media PRIVATE "${infiltratr_common_SOURCE_DIR}/include")
  target_compile_options(xfs-superblock-media PRIVATE -Wall -Wextra -Wpedantic -Werror)

@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# No release publication while XFS lacks native V2 namespace and a
-# qualifying reads through the real BOOT validator and OVMF.
+# Release publication requires validation and real file reads through the rebuilt BOOT consumer.
 # This workflow builds and retains CI artifacts only.
-name: Qualify XFS Common V2 hosted and firmware package geometry
+name: Qualify XFS Common V2 read-only hosted and firmware packages
 on:
   push:
     branches: [main]
@@ -16,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends build-essential binutils cmake git pkg-config libssl-dev libsqlite3-dev xfsprogs dpkg-dev
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends build-essential binutils cmake git pkg-config libssl-dev libsqlite3-dev xfsprogs dpkg-dev cpio busybox-static qemu-system-x86 seabios zstd
       - name: Qualify portable Common V2 package only
         run: |
           set -euo pipefail
@@ -41,17 +40,39 @@ jobs:
           dpkg-deb -x "$deb" "$RUNNER_TEMP/native-root"
           test "$(find "$RUNNER_TEMP/native-root" -type f | wc -l)" = 2
           sh tests/check_v2_exports.sh "$RUNNER_TEMP/native-root/System/Filesystems/XFS.so"
-      - name: Exercise XFS geometry through both installed package binaries
+      - name: Exercise XFS file reads and on-disk corruption through both package binaries
         run: |
           set -euo pipefail
           git clone --quiet https://github.com/Infiltrator-Projects/Libraries "$RUNNER_TEMP/common-xfs"
           git -C "$RUNNER_TEMP/common-xfs" checkout --quiet d23a52693fd3212368d327e1c1302e07ae9510ec
           cc -std=c11 -O2 -Wall -Wextra -Wpedantic -Werror -I"$RUNNER_TEMP/common-xfs/include" tests/test_superblock_media.c -ldl -o "$RUNNER_TEMP/test-xfs"
+          cc -std=c11 -O2 -Wall -Wextra -Wpedantic -Werror -I"$RUNNER_TEMP/common-xfs/include" tests/test_namespace_media.c -ldl -o "$RUNNER_TEMP/read-xfs"
+          bootfiles="$RUNNER_TEMP/xfs-boot-files"
+          bash tests/boot-file-fixtures.sh "$bootfiles"
+          export TEST_KERNEL="$bootfiles/vmlinuz" TEST_INITRAMFS="$bootfiles/initramfs"
+          release=$(basename "$(find "$bootfiles/download/kernel/boot" -name 'vmlinuz-*' -print -quit)")
+          release=${release#vmlinuz-}
+          (cd "$bootfiles/download" && apt-get download "linux-modules-$release" "linux-modules-extra-$release")
+          for deb in "$bootfiles/download"/linux-modules*.deb; do dpkg-deb -x "$deb" "$bootfiles/download/kernel"; done
+          modtree=$(find "$bootfiles/download/kernel" -type d -path "*/modules/$release" -print -quit)
+          test -n "$modtree"
+          fixtures="$RUNNER_TEMP/xfs-used"
+          bash tests/fragmented-media.sh "$TEST_KERNEL" "$modtree" "$fixtures"
+          (cd "$fixtures" && sha256sum fragmented.img dirty-log.img bad-bmap.img > images.sha256)
           for profile in portable native-root; do
             bash tests/superblock-media.sh "$RUNNER_TEMP/test-xfs" "$RUNNER_TEMP/$profile/System/Filesystems/XFS.so"
+            module="$RUNNER_TEMP/$profile/System/Filesystems/XFS.so"
+            bash tests/namespace-media.sh "$RUNNER_TEMP/read-xfs" "$module"
+            objcopy --dump-section ".infiltrator_boot=$RUNNER_TEMP/$profile.elf" "$module" "$RUNNER_TEMP/$profile.copy"
+            for binary in "$module" "$RUNNER_TEMP/$profile.elf"; do
+              for mode in fragmented dirty-log bad-bmap; do
+                "$RUNNER_TEMP/read-xfs" "$binary" "$fixtures/$mode.img" - 4096 "$mode"
+              done
+            done
           done
+          (cd "$fixtures" && sha256sum -c images.sha256)
       - uses: actions/upload-artifact@v4
         with:
-          name: XFS-v2-package-geometry
+          name: XFS-v2-read-only-packages
           path: dist/*
           if-no-files-found: error
