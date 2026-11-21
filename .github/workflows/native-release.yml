@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# No BOOT release while XFS lacks native V2 namespace and freestanding ELF,
-# and until production BOOT validator + OVMF kernel handoff pass.
+# No release publication while XFS lacks native V2 namespace and a
+# freestanding ELF, or until the real BOOT validator and OVMF checks pass.
+# This workflow builds and retains CI artifacts only.
 name: Qualify XFS Common V2 hosted DEB and native RUN
 on:
   push:
@@ -45,45 +46,3 @@ jobs:
           name: XFS-hosted-V2-not-BOOT-qualified
           path: dist/*
           if-no-files-found: error
-
-  # Only a passing source/package qualification may publish. This is a hosted
-  # Common V2 release, NOT a BOOT firmware qualification or release.
-  publish-hosted:
-    needs: qualify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: XFS-hosted-V2-not-BOOT-qualified
-          path: dist
-      - name: Publish immutable XFS hosted-only V2 artifacts after qualification
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          version="$(tr -d '\r\n' < VERSION)"
-          tag="v$version"
-          test "$(find dist -maxdepth 1 -name '*.deb' | wc -l)" = 1
-          test "$(find dist -maxdepth 1 -name '*.run' | wc -l)" = 1
-          test "$(find dist -maxdepth 1 -name '*.ko' | wc -l)" = 0
-          sha256sum dist/*.deb dist/*.run | sed 's#  dist/#  #' > dist/SHA256SUMS.txt
-          if gh release view "$tag" --json tagName >/dev/null 2>&1; then
-            target="$(gh release view "$tag" --json targetCommitish --jq .targetCommitish)"
-            if [[ "$target" != "$GITHUB_SHA" ]]; then
-              echo "REFUSING: immutable $tag belongs to $target, not $GITHUB_SHA" >&2
-              exit 1
-            fi
-          else
-            gh release create "$tag" dist/*.deb dist/*.run dist/SHA256SUMS.txt \
-              --target "$GITHUB_SHA" \
-              --title "XFS $version — hosted Common V2 only" \
-              --notes "Common V2 hosted provider, qualified source, disposable media tests, and portable/native packages. Not BOOT-qualified: no freestanding ELF or OVMF kernel/initramfs validation. No filesystem-specific Linux kernel module."
-          fi
-          mkdir -p "$RUNNER_TEMP/release-check"
-          gh release download "$tag" --dir "$RUNNER_TEMP/release-check"
-          diff -qr dist "$RUNNER_TEMP/release-check"
-          (cd "$RUNNER_TEMP/release-check" && sha256sum -c SHA256SUMS.txt)
