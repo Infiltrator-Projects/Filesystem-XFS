@@ -19,10 +19,26 @@ FetchContent_MakeAvailable(infiltratr_common)
 set_property(DIRECTORY "${infiltratr_common_SOURCE_DIR}" PROPERTY EXCLUDE_FROM_ALL TRUE)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h" "#define LD_VERSION \"${PROJECT_VERSION}\"\n")
 
-# Native endian/CRC32C engine and Common V2 probe are the entire production
-# provider. Dead code is discarded; the public ELF exports only V2.
-add_library(xfs-driver SHARED
- native/xfs_common.c module/xfs_v2_probe.c)
+# Compile the same on-disk code in the hosted provider and the import-free
+# firmware ELF. The packaged carrier embeds the exact output of the child build.
+set(XFS_FIRMWARE_ELF "${CMAKE_CURRENT_BINARY_DIR}/firmware/XFS.so")
+add_custom_command(OUTPUT "${XFS_FIRMWARE_ELF}"
+ COMMAND "${CMAKE_COMMAND}" -S "${CMAKE_CURRENT_SOURCE_DIR}/module/firmware"
+   -B "${CMAKE_CURRENT_BINARY_DIR}/firmware" -DCMAKE_BUILD_TYPE=Release
+   "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}" "-DCOMMON_INCLUDE_DIR=${infiltratr_common_SOURCE_DIR}/include"
+ COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_CURRENT_BINARY_DIR}/firmware"
+ DEPENDS module/firmware/CMakeLists.txt module/firmware/runtime.c module/xfs_v2_probe.c
+   native/xfs_disk.c native/xfs_disk.h
+   "${infiltratr_common_SOURCE_DIR}/include/infiltratr/filesystem_module_v2.h"
+   "${infiltratr_common_SOURCE_DIR}/include/infiltratr/filesystem_ro_sessions_v2.h"
+ VERBATIM)
+add_custom_target(xfs-firmware DEPENDS "${XFS_FIRMWARE_ELF}")
+add_library(xfs-driver SHARED native/xfs_disk.c module/xfs_v2_probe.c)
+add_dependencies(xfs-driver xfs-firmware)
+set_property(TARGET xfs-driver APPEND PROPERTY LINK_DEPENDS "${XFS_FIRMWARE_ELF}")
+add_custom_command(TARGET xfs-driver POST_BUILD
+ COMMAND "${CMAKE_OBJCOPY}" --add-section ".infiltrator_boot=${XFS_FIRMWARE_ELF}"
+   --set-section-flags .infiltrator_boot=readonly "$<TARGET_FILE:xfs-driver>" VERBATIM)
 set_target_properties(xfs-driver PROPERTIES
  PREFIX "" OUTPUT_NAME "XFS" SUFFIX ".so" C_VISIBILITY_PRESET hidden)
 target_compile_definitions(xfs-driver PRIVATE _GNU_SOURCE _FILE_OFFSET_BITS=64)
@@ -41,7 +57,7 @@ if(BUILD_TESTING)
  # Preserve original native mutation/metadata and fixture tests. Do not
  # package or load this historical test library in production.
  add_library(xfs-historical-test-support SHARED
-   native/xfs_catalog.c native/xfs_common.c native/xfs_plan.c
+   native/xfs_catalog.c native/xfs_common.c native/xfs_disk.c native/xfs_plan.c
    native/xfs_metadata.c native/xfs_worker.c
    compat/legacy_services.c compat/runtime_alloc.c
    fixtures/xfs_codec.c module/xfs_fixture_bridge.c)

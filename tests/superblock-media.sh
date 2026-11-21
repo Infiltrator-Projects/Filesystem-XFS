@@ -8,23 +8,30 @@ module=$(realpath "${2:?packaged XFS.so}")
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 cd "$work"
+objcopy --dump-section ".infiltrator_boot=reader.elf" "$module" carrier-copy.elf
+test -s reader.elf
+test -z "$(nm -Du reader.elf)"
+if readelf -dW reader.elf | grep '(NEEDED)' >/dev/null; then exit 1; fi
 for disk_sector in 512 4096; do
     truncate -s 320M clean.img
     mkfs.xfs -q -f -s "size=$disk_sector" -b size=4096 clean.img
     sha256sum clean.img > clean.sha256
     for host_sector in 512 4096 8192; do
         "$exercise" "$module" clean.img "$host_sector" clean
+        "$exercise" "$work/reader.elf" clean.img "$host_sector" clean
     done
     for field in 'sectlog 13' 'inodelog 11' 'agblklog 3' 'dirblklog 5' 'imax_pct 101'; do
         cp --sparse=always --reflink=auto clean.img corrupt.img
         xfs_db -x -c 'sb 0' -c "write -d $field" corrupt.img
         sha256sum corrupt.img > corrupt.sha256
         "$exercise" "$module" corrupt.img 4096 geometry "$disk_sector"
+        "$exercise" "$work/reader.elf" corrupt.img 4096 geometry "$disk_sector"
         sha256sum -c corrupt.sha256
     done
     cp --sparse=always --reflink=auto clean.img corrupt.img
     printf '\001' | dd of=corrupt.img bs=1 seek=$((disk_sector-1)) conv=notrunc status=none
     sha256sum corrupt.img > corrupt.sha256
     "$exercise" "$module" corrupt.img 512 corrupt
+    "$exercise" "$work/reader.elf" corrupt.img 512 corrupt
     sha256sum -c clean.sha256 corrupt.sha256
 done

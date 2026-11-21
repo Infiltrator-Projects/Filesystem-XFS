@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # No release publication while XFS lacks native V2 namespace and a
-# freestanding ELF, or until the real BOOT validator and OVMF checks pass.
+# qualifying reads through the real BOOT validator and OVMF.
 # This workflow builds and retains CI artifacts only.
-name: Qualify XFS Common V2 hosted DEB and native RUN
+name: Qualify XFS Common V2 hosted and firmware package geometry
 on:
   push:
     branches: [main]
@@ -52,6 +52,6 @@ jobs:
           done
       - uses: actions/upload-artifact@v4
         with:
-          name: XFS-hosted-V2-not-BOOT-qualified
+          name: XFS-v2-package-geometry
           path: dist/*
           if-no-files-found: error

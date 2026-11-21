@@ -38,6 +38,10 @@ int main(int argc, char **argv)
     memcpy(&entry, &symbol, sizeof(entry));
     const IfsFsModuleApiV2 *api = entry();
     REQUIRE(ifs_fs_api_v2_valid(api, "xfs"));
+    const char *suffix = strrchr(argv[1], '.');
+    uint32_t profile = suffix && !strcmp(suffix, ".elf") ?
+        IFS_FS_PROFILE_FREESTANDING | IFS_FS_PROFILE_FIRMWARE : IFS_FS_PROFILE_HOSTED;
+    REQUIRE(api->runtime_profiles == profile);
     const IfsFsCoreOpsV2 *core = (const void *)ifs_fs_group_v2(api, IFS_FS_GROUP_CORE);
     REQUIRE(core && core->probe && core->mount && core->unmount);
     Image image = { .fd = open(argv[2], O_RDONLY), .sector = (uint32_t)strtoul(argv[3], NULL, 10) };

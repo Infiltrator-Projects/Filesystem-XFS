@@ -31,12 +31,12 @@ def run(args):
 
 def install_deps():
     packages = ("build-essential", "binutils", "cmake", "git", "pkg-config",
-                "libssl-dev", "libsqlite3-dev", "dpkg-dev")
+                "libssl-dev", "libsqlite3-dev", "dpkg-dev", "xfsprogs")
     missing = [p for p in packages if subprocess.run(
         ["dpkg-query", "-W", "-f=$" + "{Status}", p], capture_output=True,
         text=True).stdout.strip() != "install ok installed"]
     tools = ("cc", "c++", "make", "cmake", "git", "readelf", "nm",
-             "dpkg-deb", "dpkg-query", "pkg-config", "ctest")
+             "dpkg-deb", "dpkg-query", "pkg-config", "ctest", "xfs_db", "mkfs.xfs")
     if missing or any(shutil.which(cmd) is None for cmd in tools):
         prefix = [] if os.geteuid() == 0 else ["sudo"]
         apt = [*prefix, "apt-get", "-o", "DPkg::Lock::Timeout=-1"]
@@ -98,6 +98,20 @@ def inspect(module):
     if exports != {ABI}:
         raise RuntimeError(f"{NAME} must export only {ABI}, found {sorted(exports)}")
     dependencies(module)
+    with tempfile.TemporaryDirectory(prefix="xfs-embedded-") as scratch:
+        firmware = Path(scratch) / "XFS.elf"
+        run(["objcopy", "--dump-section", ".infiltrator_boot=" + str(firmware),
+             module, Path(scratch) / "carrier"])
+        if not firmware.is_file():
+            raise RuntimeError("Missing XFS firmware ELF")
+        run(["sh", ROOT / "tests/check_v2_exports.sh", firmware])
+        imports = subprocess.check_output(["nm", "-Du", firmware], text=True)
+        dynamic = subprocess.check_output(["readelf", "-dW", firmware], text=True)
+        relocations = subprocess.check_output(["readelf", "-rW", firmware], text=True)
+        if imports.strip() or "(NEEDED)" in dynamic or any(
+            kind != "R_X86_64_RELATIVE" for kind in re.findall(r"R_X86_64_\w+", relocations)
+        ):
+            raise RuntimeError("XFS firmware has external dependencies or unsupported relocations")
 
 def test(module, workspace=None):
     # CTest / make test are run for every pass by build(); this rechecks the installed bytes.

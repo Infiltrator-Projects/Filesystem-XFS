@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <sqlite3.h>
+#include "xfs_disk.h"
 /*
  * Native XFS v5 representation contract.
  *
@@ -209,15 +210,6 @@ typedef struct {
     size_t capacity;
 } XfsRmapVec;
 
-uint16_t xfs_be16(const uint8_t *p);
-uint32_t xfs_be32(const uint8_t *p);
-uint64_t xfs_be64(const uint8_t *p);
-void xfs_put_be16(uint8_t *p, uint16_t value);
-void xfs_put_be32(uint8_t *p, uint32_t value);
-void xfs_put_be64(uint8_t *p, uint64_t value);
-uint32_t xfs_crc32c_intermediate(const uint8_t *data, size_t length, uint32_t seed);
-uint32_t xfs_crc_field(const uint8_t *data, size_t length, size_t field);
-void xfs_write_crc_le(uint8_t *data, size_t length, size_t field);
 
 void xfs_range_push(XfsRangeVec *vec, uint64_t start, uint64_t end);
 void xfs_range_sort_merge(XfsRangeVec *vec);
