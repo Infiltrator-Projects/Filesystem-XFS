@@ -72,6 +72,16 @@ int main(void){
     be16(disk+100,5);be16(disk+102,4096);
     xfs_write_crc_le(disk,4096u,224u);
     CHECK(core->probe(&h,&variant)==IFS_FS_OK && variant==5);
+    /* Reject checksum-valid but unsupported v5 metadata formats. */
+    be32(disk+216u,UINT32_C(0x10)); /* NEEDSREPAIR */
+    xfs_write_crc_le(disk,4096u,224u);variant=0;
+    CHECK(core->probe(&h,&variant)==IFS_FS_UNSUPPORTED && variant==0u);
+    be32(disk+216u,UINT32_C(0x80000000));
+    xfs_write_crc_le(disk,4096u,224u);
+    CHECK(core->probe(&h,&variant)==IFS_FS_UNSUPPORTED && variant==0u);
+    be32(disk+216u,0u);
+    xfs_write_crc_le(disk,4096u,224u);
+    CHECK(core->probe(&h,&variant)==IFS_FS_OK && variant==5u);
     disk[1024]^=1u;variant=0;
     CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
     disk[1024]^=1u;

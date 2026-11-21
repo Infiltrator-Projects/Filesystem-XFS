@@ -66,6 +66,12 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
        sb[123]>=63u ||
        (UINT64_C(1)<<sb[123])!=xfs_be16(sb+106))
         goto done;
+    /* The on-disk INPROGRESS bit is set while formatting and must never
+     * identify an incomplete volume as mountable. */
+    if (sb[126u]) {
+        result=IFS_FS_UNSUPPORTED;
+        goto done;
+    }
     /* XFS v5 CRC covers the entire on-disk superblock sector, which
      * can be 4096 bytes rather than the first 512-byte identity record. */
     if(version==5u) {
@@ -90,6 +96,16 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
         }
         if(le32(sb+224)!=xfs_crc_field(sb,disk_sector,224u))
             goto done;
+        /* Do not accept a checksum-valid filesystem requiring repair or
+         * using incompatible metadata formats the current reader does not
+         * interpret. Retain known v5 FTYPE/SPINODES/META_UUID/BIGTIME/
+         * NREXT64 superblocks for read-only metadata recognition only. */
+        const uint32_t incompat=xfs_be32(sb+216u);
+        if ((incompat & ~UINT32_C(0x2fu)) ||
+            (incompat & UINT32_C(0x10u))) {
+            result=IFS_FS_UNSUPPORTED;
+            goto done;
+        }
     }
     *variant=version;
     if(volume) {
