@@ -101,8 +101,8 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant,
          * interpret. Retain known v5 FTYPE/SPINODES/META_UUID/BIGTIME/
          * NREXT64 superblocks for read-only metadata recognition only. */
         const uint32_t incompat=xfs_be32(sb+216u);
-        if ((incompat & ~UINT32_C(0x2fu)) ||
-            (incompat & UINT32_C(0x10u))) {
+        if ((incompat & ~UINT32_C(0x2f)) ||
+            (incompat & UINT32_C(0x10))) {
             result=IFS_FS_UNSUPPORTED;
             goto done;
         }
