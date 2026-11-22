@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Release publication requires validation and real file reads through the rebuilt BOOT consumer.
-# This workflow builds and retains CI artifacts only.
+# Publish only after actual packaged V2 read-only media and corruption tests.
+# Full BOOT/OVMF handoff remains a separate qualification, not a release claim.
 name: Qualify XFS Common V2 read-only hosted and firmware packages
 on:
   push:
@@ -76,3 +76,43 @@ jobs:
           name: XFS-v2-read-only-packages
           path: dist/*
           if-no-files-found: error
+  publish:
+    needs: qualify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: XFS-v2-read-only-packages
+          path: dist
+      - name: Publish qualified V2 packages without kernel substitutes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$GITHUB_SHA"
+          version="$(tr -d '\r\n' < VERSION)"
+          tag="v$version"
+          test "$(find dist -maxdepth 1 -name '*.deb' | wc -l)" -eq 1
+          test "$(find dist -maxdepth 1 -name '*.run' | wc -l)" -eq 1
+          ! find dist -name '*.ko' | grep .
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Immutable existing release retained; bump VERSION before next release"
+            exit 0
+          fi
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+            echo "Tag exists without a verified release; refuse to overwrite" >&2
+            exit 1
+          fi
+          (cd dist && sha256sum -- *.deb *.run > SHA256SUMS.txt && sha256sum -c SHA256SUMS.txt)
+          gh release create "$tag" dist/*.deb dist/*.run dist/SHA256SUMS.txt \
+            --target "$GITHUB_SHA" \
+            --title "XFS native Common V2 filesystem reader $version" \
+            --notes "V2-only XFS.so with embedded freestanding read-only reader; portable DEB and native source RUN. Verified packaged namespace, kernel/initramfs, dirty-log and corrupted metadata images. No Linux kernel fallback. Full future BOOT/OVMF integration is not claimed."
+          mkdir -p "$RUNNER_TEMP/released"
+          gh release download "$tag" --dir "$RUNNER_TEMP/released"
+          (cd "$RUNNER_TEMP/released" && sha256sum -c SHA256SUMS.txt)
