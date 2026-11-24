@@ -571,6 +571,19 @@ static int fill(const Inode *inode, const Search *where, IfsFsEntryV2 *out)
     memcpy(out->name, where->name, where->length + 1u);
     return IFS_FS_OK;
 }
+/* Return native inode ownership and permissions from the same verified
+ * namespace traversal used by stat. No synthetic modes, no mutation. */
+int xfs_reader_metadata(const XfsReader *r,const char *path,IfsFsMetadataV2 *out)
+{
+    if(!out || out->structure_bytes<sizeof(*out)) return IFS_FS_INVALID;
+    Inode inode;
+    Search search;
+    int rc=resolve(r,path,&inode,&search);
+    if(rc) return rc;
+    *out=(IfsFsMetadataV2){.structure_bytes=sizeof(*out),.mask=IFS_FS_META_GET_MODE,
+        .mode=xfs_be16(inode.raw+2),.owner=xfs_be32(inode.raw+8),.group=xfs_be32(inode.raw+12)};
+    return IFS_FS_OK;
+}
 int xfs_reader_stat(const XfsReader *r, const char *path, IfsFsEntryV2 *out)
 {
     Inode inode;

@@ -14,6 +14,7 @@ typedef struct {
 
 int xfs_reader_configure(XfsReader *, const IfsFsHostRuntimeV2 *, const uint8_t *);
 int xfs_reader_check_root(const XfsReader *);
+int xfs_reader_metadata(const XfsReader *r,const char *path,IfsFsMetadataV2 *out);
 int xfs_reader_stat(const XfsReader *, const char *, IfsFsEntryV2 *);
 int xfs_reader_list(const XfsReader *, const char *, uint32_t, IfsFsEntryV2 *);
 int xfs_reader_read(const XfsReader *, const char *, uint64_t, void *, uint32_t);

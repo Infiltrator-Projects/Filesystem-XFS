@@ -156,6 +156,16 @@ int main(int argc, char **argv)
             .structure_bytes = sizeof(e), .name = name, .name_capacity = sizeof(name)};
         CHECK(core->stat(mount, "/", &e) == IFS_FS_OK && e.type == IFS_FS_ENTRY_DIRECTORY);
         CHECK(core->stat(mount, "/boot/missing", &e) == IFS_FS_NOT_FOUND);
+        const IfsFsMetadataOpsV2 *meta=(const void *)ifs_fs_group_v2(api,IFS_FS_GROUP_METADATA);
+        IfsFsMetadataV2 metadata={.structure_bytes=sizeof(metadata)};
+        CHECK(meta && meta->get && !meta->set &&
+              meta->header.capabilities==IFS_FS_META_GET_MODE);
+        CHECK(meta->get(mount,"/boot/inline",&metadata)==IFS_FS_OK &&
+              metadata.mask==IFS_FS_META_GET_MODE &&
+              (metadata.mode&0170000u)==0100000u);
+        CHECK(metadata.mode==0100644u && metadata.owner==0u && metadata.group==0u);
+        CHECK(meta->get(mount,"/boot/missing",&metadata)==IFS_FS_NOT_FOUND);
+        CHECK(meta->get(second,"/",&metadata)==IFS_FS_INVALID);
         if (access(argv[3], R_OK) == 0) {
             char check_path[1024];
             CHECK(snprintf(check_path, sizeof(check_path), "%s/many", argv[3]) <
