@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
  * Common V2 raw-device probe using the canonical native XFS geometry and
- * checksum helpers. No path, fd, write, or staging operations are exposed.
+ * checksum helpers. No path, fd, or staging operations are exposed; native hosted format uses Common V2.
  * Historical analysis and mutation code is compiled only for regression tests.
  */
 #include <infiltratr/filesystem_module_v2.h>
@@ -152,6 +152,9 @@ typedef struct {
 static Mount mounts[IFS_FS_RO_MAX_SESSIONS_V2];
 static atomic_flag registry_lock = ATOMIC_FLAG_INIT;
 static uintptr_t next_token;
+#ifndef IFS_XFS_FIRMWARE
+static int formatting;
+#endif
 static void lock_mounts(void)
 {
     while (atomic_flag_test_and_set_explicit(&registry_lock, memory_order_acquire)) {
@@ -190,6 +193,9 @@ static int mount_volume(const IfsFsHostRuntimeV2 *h, void **handle, IfsFsVolumeI
         return rc;
     }
     lock_mounts();
+#ifndef IFS_XFS_FIRMWARE
+    if(formatting){unlock_mounts();h->release(h->context,reader);return IFS_FS_BUSY;}
+#endif
     for (unsigned i = 0; i < IFS_FS_RO_MAX_SESSIONS_V2 && next_token != UINTPTR_MAX; ++i) {
         if (mounts[i].reader)
             continue;
@@ -269,10 +275,217 @@ static int read_file(void *handle, const char *path, uint64_t offset, void *out,
     Mount *m = acquire(handle);
     return m ? finished(m, xfs_reader_read(m->reader, path, offset, out, bytes)) : IFS_FS_INVALID;
 }
+#ifndef IFS_XFS_FIRMWARE
+/* Native XFS v5 empty-volume creation. Initial deliberately bounded
+ * profile: 4 KiB blocks, 512-byte disk sectors, four equal power-of-two
+ * allocation groups, 512-byte v3 inodes, internal 64 MiB log, FTYPE.
+ * No sparse inode chunks, reflink, reverse mapping or realtime device.
+ * Independent xfs_repair checks the actual output before release.
+ * Layout follows the retained canonical XFS disk definitions. */
+enum { FMT_BLOCK=4096u,FMT_SECTOR=512u,FMT_AGS=4u,
+       FMT_LOG_AG=2u,FMT_LOG_START=8u,FMT_LOG_BLOCKS=16384u };
+static int fmt_write(const IfsFsHostRuntimeV2 *h,uint64_t at,const void *p,uint32_t n)
+{
+    if(h->cancelled && h->cancelled(h->context))return IFS_FS_BUSY;
+    return ifs_fs_host_write_bytes_v2(h,at,p,n);
+}
+static void fmt_tree(uint8_t *p,const char *magic,uint32_t ag,
+                     uint64_t disk_block,const uint8_t *uuid,uint16_t count)
+{
+    memset(p,0,FMT_BLOCK);memcpy(p,magic,4u);
+    xfs_put_be16(p+6,count);xfs_put_be32(p+8,UINT32_MAX);
+    xfs_put_be32(p+12,UINT32_MAX);xfs_put_be64(p+16,disk_block*8u);
+    memcpy(p+32,uuid,16u);xfs_put_be32(p+48,ag);
+}
+static int format_impl(const IfsFsHostRuntimeV2 *h,const char *label)
+{
+    const uint64_t blocks=h->volume_bytes/FMT_BLOCK;
+    const uint32_t agblocks=(uint32_t)(blocks/FMT_AGS);
+    unsigned aglog=0u;
+    for(uint32_t n=agblocks;n>1u;n>>=1)++aglog;
+    uint8_t uuid[16];
+    int rc=ifs_fs_host_random_bytes_v2(h,uuid,sizeof(uuid));
+    if(rc!=IFS_FS_OK)return rc;
+    uuid[6]=(uint8_t)((uuid[6]&15u)|64u);uuid[8]=(uint8_t)((uuid[8]&63u)|128u);
+    uint32_t now=0u;
+    if(h->realtime_ns) {
+        uint64_t t=h->realtime_ns(h->context)/1000000000ull;
+        if(t<=INT32_MAX)now=(uint32_t)t;
+    }
+    const uint64_t logbase=(uint64_t)FMT_LOG_AG*agblocks+FMT_LOG_START;
+    uint8_t sb[FMT_SECTOR]={0},block[FMT_BLOCK]={0};
+    /* Count AGFL blocks as free in the global summary but not in AGF's
+     * ordinary free-space B-tree count. Four freelist blocks per AG. */
+    const uint64_t free=blocks-4u*FMT_AGS-8u-FMT_LOG_BLOCKS;
+    memcpy(sb,"XFSB",4u);xfs_put_be32(sb+4,FMT_BLOCK);
+    xfs_put_be64(sb+8,blocks);memcpy(sb+32,uuid,16u);
+    xfs_put_be64(sb+48,logbase);xfs_put_be64(sb+56,64u);
+    xfs_put_be64(sb+64,65u);xfs_put_be64(sb+72,66u);
+    xfs_put_be32(sb+80,1u);xfs_put_be32(sb+84,agblocks);
+    xfs_put_be32(sb+88,FMT_AGS);xfs_put_be32(sb+96,FMT_LOG_BLOCKS);
+    xfs_put_be16(sb+100,0xb4a5u);xfs_put_be16(sb+102,FMT_SECTOR);
+    xfs_put_be16(sb+104,512u);xfs_put_be16(sb+106,8u);
+    memcpy(sb+108,label,strlen(label));
+    sb[120]=12u;sb[121]=9u;sb[122]=9u;sb[123]=3u;
+    sb[124]=(uint8_t)aglog;sb[127]=25u;
+    xfs_put_be64(sb+128,64u);xfs_put_be64(sb+136,61u);
+    xfs_put_be64(sb+144,free);
+    xfs_put_be64(sb+160,UINT64_MAX);xfs_put_be64(sb+168,UINT64_MAX);
+    xfs_put_be32(sb+180,8u);xfs_put_be32(sb+196,1u);
+    xfs_put_be32(sb+200,0x18au);xfs_put_be32(sb+204,0x18au);
+    xfs_put_be32(sb+216,1u);xfs_put_be64(sb+232,UINT64_MAX);
+    /* Erase all intended superblock identities first, then write all
+     * headers with inprogress set. No valid primary before durable data. */
+    for(uint32_t ag=0;ag<FMT_AGS;++ag) {
+        rc=fmt_write(h,(uint64_t)ag*agblocks*FMT_BLOCK,block,sizeof(block));
+        if(rc!=IFS_FS_OK)return rc;
+    }
+    if(h->flush(h->context)!=0)return IFS_FS_IO_ERROR;
+    sb[126]=1u;xfs_write_crc_le(sb,sizeof(sb),224u);
+    for(uint32_t ag=0;ag<FMT_AGS;++ag) {
+        const uint64_t base=(uint64_t)ag*agblocks;
+        const uint32_t start=ag==0?16u:ag==FMT_LOG_AG?FMT_LOG_START+FMT_LOG_BLOCKS:8u;
+        const uint32_t count=agblocks-start;
+        memset(block,0,sizeof(block));memcpy(block,sb,sizeof(sb));
+        uint8_t *agf=block+512u,*agi=block+1024u,*agfl=block+1536u;
+        memcpy(agf,"XAGF",4u);xfs_put_be32(agf+4,1u);xfs_put_be32(agf+8,ag);
+        xfs_put_be32(agf+12,agblocks);xfs_put_be32(agf+16,1u);
+        xfs_put_be32(agf+20,2u);xfs_put_be32(agf+28,1u);
+        xfs_put_be32(agf+32,1u);xfs_put_be32(agf+44,3u);
+        xfs_put_be32(agf+48,4u);xfs_put_be32(agf+52,count);
+        xfs_put_be32(agf+56,count);memcpy(agf+64,uuid,16u);
+        xfs_write_crc_le(agf,512u,216u);
+        memcpy(agi,"XAGI",4u);xfs_put_be32(agi+4,1u);xfs_put_be32(agi+8,ag);
+        xfs_put_be32(agi+12,agblocks);xfs_put_be32(agi+16,ag?0u:64u);
+        xfs_put_be32(agi+20,3u);xfs_put_be32(agi+24,1u);
+        xfs_put_be32(agi+28,ag?0u:61u);xfs_put_be32(agi+32,ag?UINT32_MAX:64u);
+        xfs_put_be32(agi+36,UINT32_MAX);
+        for(unsigned i=0;i<64u;++i)xfs_put_be32(agi+40u+4u*i,UINT32_MAX);
+        memcpy(agi+296,uuid,16u);xfs_write_crc_le(agi,512u,312u);
+        memcpy(agfl,"XAFL",4u);xfs_put_be32(agfl+4,ag);memcpy(agfl+8,uuid,16u);
+        for(unsigned i=36u;i<512u;i+=4u)xfs_put_be32(agfl+i,UINT32_MAX);
+        for(unsigned i=0;i<4u;++i)xfs_put_be32(agfl+36u+4u*i,4u+i);
+        xfs_write_crc_le(agfl,512u,32u);
+        rc=fmt_write(h,base*FMT_BLOCK,block,sizeof(block));if(rc!=IFS_FS_OK)return rc;
+        for(unsigned i=1;i<=2u;++i) {
+            fmt_tree(block,i==1?"AB3B":"AB3C",ag,base+i,uuid,1u);
+            xfs_put_be32(block+56,start);xfs_put_be32(block+60,count);
+            xfs_write_crc_le(block,sizeof(block),52u);
+            rc=fmt_write(h,(base+i)*FMT_BLOCK,block,sizeof(block));
+            if(rc!=IFS_FS_OK)return rc;
+        }
+        fmt_tree(block,"IAB3",ag,base+3u,uuid,ag?0u:1u);
+        if(!ag) {
+            xfs_put_be32(block+56,64u);xfs_put_be32(block+60,61u);
+            xfs_put_be64(block+64,UINT64_MAX<<3u);
+        }
+        xfs_write_crc_le(block,sizeof(block),52u);
+        rc=fmt_write(h,(base+3u)*FMT_BLOCK,block,sizeof(block));
+        if(rc!=IFS_FS_OK)return rc;
+        memset(block,0,sizeof(block));
+        for(unsigned i=4u;i<8u;++i) {
+            rc=fmt_write(h,(base+i)*FMT_BLOCK,block,sizeof(block));
+            if(rc!=IFS_FS_OK)return rc;
+        }
+    }
+    /* Initialize an entire 64-inode chunk. Root is an empty shortform
+     * directory; the two mandatory realtime metadata inodes have no data. */
+    for(unsigned b=0;b<8u;++b) {
+        memset(block,0,sizeof(block));
+        for(unsigned i=0;i<8u;++i) {
+            const unsigned index=b*8u+i;
+            uint8_t *ino=block+512u*i;
+            xfs_put_be16(ino,0x494eu);ino[4]=3u;ino[5]=2u;
+            xfs_put_be32(ino+92,index+1u);xfs_put_be32(ino+96,UINT32_MAX);
+            xfs_put_be64(ino+152,64u+index);memcpy(ino+160,uuid,16u);
+            if(index<3u) {
+                xfs_put_be16(ino+2,index?0100600u:0040755u);
+                xfs_put_be32(ino+16,index?1u:2u);
+                xfs_put_be32(ino+32,now);xfs_put_be32(ino+40,now);
+                xfs_put_be32(ino+48,now);xfs_put_be32(ino+144,now);
+                if(!index) {
+                    ino[5]=1u;xfs_put_be64(ino+56,6u);
+                    xfs_put_be32(ino+178,64u);
+                } else if(index==1u)xfs_put_be16(ino+90,4u);
+            }
+            xfs_write_crc_le(ino,512u,100u);
+        }
+        rc=fmt_write(h,(uint64_t)(8u+b)*FMT_BLOCK,block,sizeof(block));
+        if(rc!=IFS_FS_OK)return rc;
+    }
+    /* Clear the full log and create the canonical initial unmount record.
+     * The initial formatting log has cycle one and no record CRC. */
+    uint8_t *zero=h->allocate(h->context,65536u);
+    if(!zero)return IFS_FS_NO_MEMORY;
+    memset(zero,0,65536u);
+    for(uint32_t off=0;off<FMT_LOG_BLOCKS;off+=16u) {
+        rc=fmt_write(h,(logbase+off)*FMT_BLOCK,zero,65536u);
+        if(rc!=IFS_FS_OK)break;
+    }
+    h->release(h->context,zero);if(rc!=IFS_FS_OK)return rc;
+    memset(block,0,sizeof(block));xfs_put_be32(block,0xfeedbabeu);
+    xfs_put_be32(block+4,1u);xfs_put_be32(block+8,2u);
+    xfs_put_be32(block+12,512u);xfs_put_be64(block+16,UINT64_C(1)<<32);
+    xfs_put_be64(block+24,UINT64_C(1)<<32);xfs_put_be32(block+36,UINT32_MAX);
+    xfs_put_be32(block+40,1u);xfs_put_be32(block+44,0xb0c0d0d0u);
+    xfs_put_be32(block+300,1u);memcpy(block+304,uuid,16u);
+    xfs_put_be32(block+320,32768u);
+    xfs_put_be32(block+512,1u);xfs_put_be32(block+516,8u);
+    block[520]=0xaau;block[521]=0x20u;block[524]=0x6eu;block[525]=0x55u;
+    rc=fmt_write(h,logbase*FMT_BLOCK,block,sizeof(block));if(rc!=IFS_FS_OK)return rc;
+    if(h->flush(h->context)!=0)return IFS_FS_IO_ERROR;
+    sb[126]=0u;xfs_write_crc_le(sb,sizeof(sb),224u);
+    for(uint32_t ag=1u;ag<FMT_AGS;++ag) {
+        rc=fmt_write(h,(uint64_t)ag*agblocks*FMT_BLOCK,sb,sizeof(sb));
+        if(rc!=IFS_FS_OK)return rc;
+    }
+    if(h->flush(h->context)!=0)return IFS_FS_IO_ERROR;
+    rc=fmt_write(h,0u,sb,sizeof(sb));if(rc!=IFS_FS_OK)return rc;
+    if(h->flush(h->context)!=0) {
+        memset(sb,0,sizeof(sb));(void)ifs_fs_host_write_bytes_v2(h,0u,sb,sizeof(sb));
+        (void)h->flush(h->context);return IFS_FS_IO_ERROR;
+    }
+    XfsReader reader;uint32_t observed=0u;
+    rc=inspect(h,&observed,NULL,&reader);
+    return rc?rc:observed!=5u?IFS_FS_CORRUPT:xfs_reader_check_root(&reader);
+}
+static int format_volume(const IfsFsHostRuntimeV2 *h,uint32_t variant,
+                          const char *label,uint32_t flags)
+{
+    if(!ifs_fs_host_v2_valid(h))return IFS_FS_INVALID;
+    if((h->capabilities&IFS_FS_HOST_READ_ONLY) ||
+       !(h->capabilities&IFS_FS_HOST_EXCLUSIVE) ||
+       !(h->capabilities&IFS_FS_HOST_DURABLE))return IFS_FS_ACCESS;
+    if(variant!=5u || flags || h->logical_sector_bytes>FMT_BLOCK ||
+       h->volume_bytes<512ull*1024u*1024u ||
+       h->volume_bytes>16ull*1024u*1024u*1024u ||
+       (h->volume_bytes&(h->volume_bytes-1u)))return IFS_FS_UNSUPPORTED;
+    if(!label)label="";
+    if(strlen(label)>12u)return IFS_FS_INVALID;
+    for(const char *p=label;*p;++p)
+        if((unsigned char)*p<33u || (unsigned char)*p>126u || *p=='/')return IFS_FS_INVALID;
+    lock_mounts();
+    if(formatting){unlock_mounts();return IFS_FS_BUSY;}
+    for(unsigned i=0;i<IFS_FS_RO_MAX_SESSIONS_V2;++i)
+        if(mounts[i].reader){unlock_mounts();return IFS_FS_BUSY;}
+    formatting=1;unlock_mounts();
+    const int rc=format_impl(h,label);
+    lock_mounts();formatting=0;unlock_mounts();return rc;
+}
+#endif
+
 static const IfsFsVolumeOpsV2 volume_ops = {
     .header = {IFS_FS_GROUP_ABI_V2, sizeof(IfsFsVolumeOpsV2), IFS_FS_GROUP_VOLUME, 0u,
-               IFS_FS_VOLUME_QUERY},
-    .query = query_volume};
+               IFS_FS_VOLUME_QUERY
+#ifndef IFS_XFS_FIRMWARE
+               | IFS_FS_VOLUME_FORMAT
+#endif
+    },
+    .query = query_volume
+#ifndef IFS_XFS_FIRMWARE
+    ,.format = format_volume
+#endif
+};
 static const IfsFsCoreOpsV2 core = {
     .header = {IFS_FS_GROUP_ABI_V2, sizeof(IfsFsCoreOpsV2), IFS_FS_GROUP_CORE, 0u,
                IFS_FS_CORE_PROBE | IFS_FS_CORE_MOUNT | IFS_FS_CORE_STAT | IFS_FS_CORE_LIST |

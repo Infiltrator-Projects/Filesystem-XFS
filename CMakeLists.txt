@@ -79,6 +79,11 @@ if(BUILD_TESTING)
  target_link_libraries(xfs-historical-test-support PRIVATE
    InfiltratrCommon::Common OpenSSL::Crypto SQLite::SQLite3 Threads::Threads)
 
+ add_executable(xfs-native-format-test tests/test_format.c)
+ target_include_directories(xfs-native-format-test PRIVATE "${infiltratr_common_SOURCE_DIR}/include")
+ target_link_libraries(xfs-native-format-test PRIVATE ${CMAKE_DL_LIBS})
+ target_compile_options(xfs-native-format-test PRIVATE -Wall -Wextra -Wpedantic -Werror)
+ add_test(NAME xfs-native-format COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/format_media.sh" "$<TARGET_FILE:xfs-native-format-test>" "$<TARGET_FILE:xfs-driver>")
  add_executable(xfs-module-test tests/test_module.c)
  target_include_directories(xfs-module-test PRIVATE
    "${infiltratr_common_SOURCE_DIR}/include")
