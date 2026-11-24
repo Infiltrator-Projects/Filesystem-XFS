@@ -123,6 +123,13 @@ if(BUILD_TESTING)
    -Wall -Wextra -Wpedantic -Werror)
  target_link_libraries(xfs-test-host PUBLIC xfs-historical-test-support)
 
+ # The installer exercises only the production descriptor, in-memory probe
+ # and V2 export contract; historical relocation and real-media regression
+ # tests remain in the unrestricted CI suite. The probe executes production
+ # code so the instrumented native build collects genuine PGO samples.
+ set_tests_properties(xfs-module-contract xfs-common-v2-probe
+   xfs-v2-only-dynamic-export PROPERTIES LABELS "install-smoke" TIMEOUT 30)
+
  add_executable(xfs-native-test tests/test_xfs_native.c)
  target_include_directories(xfs-native-test PRIVATE
    "${CMAKE_CURRENT_SOURCE_DIR}/native"
