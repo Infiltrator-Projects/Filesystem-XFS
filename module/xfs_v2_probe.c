@@ -331,7 +331,7 @@ static int format_impl(const IfsFsHostRuntimeV2 *h,const char *label)
     xfs_put_be64(sb+128,64u);xfs_put_be64(sb+136,61u);
     xfs_put_be64(sb+144,free);
     xfs_put_be64(sb+160,UINT64_MAX);xfs_put_be64(sb+168,UINT64_MAX);
-    xfs_put_be32(sb+180,8u);xfs_put_be32(sb+196,1u);
+    xfs_put_be32(sb+180,4u);xfs_put_be32(sb+196,1u);
     xfs_put_be32(sb+200,0x18au);xfs_put_be32(sb+204,0x18au);
     xfs_put_be32(sb+216,1u);xfs_put_be64(sb+232,UINT64_MAX);
     /* Erase all intended superblock identities first, then write all
