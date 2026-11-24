@@ -487,14 +487,30 @@ static const IfsFsMetadataOpsV2 metadata_ops={
              IFS_FS_META_GET_MODE},
     .get=get_metadata
 };
+/* Return the label from the validated mounted superblock, preserving
+ * the reader's lifetime and refusing partial output. */
+static int volume_label(void *handle,char *out,uint32_t capacity,uint32_t *bytes)
+{
+    if(!bytes)return IFS_FS_INVALID;
+    *bytes=0u;
+    if(!out || !capacity)return IFS_FS_INVALID;
+    Mount *m=acquire(handle);
+    if(!m)return IFS_FS_INVALID;
+    uint32_t n=0u;
+    while(n<sizeof(m->reader->label) && m->reader->label[n])++n;
+    if(n>=capacity)return finished(m,IFS_FS_NO_SPACE);
+    memcpy(out,m->reader->label,n);
+    out[n]=0;*bytes=n;
+    return finished(m,IFS_FS_OK);
+}
 static const IfsFsVolumeOpsV2 volume_ops = {
     .header = {IFS_FS_GROUP_ABI_V2, sizeof(IfsFsVolumeOpsV2), IFS_FS_GROUP_VOLUME, 0u,
-               IFS_FS_VOLUME_QUERY
+               IFS_FS_VOLUME_QUERY | IFS_FS_VOLUME_LABEL_GET
 #ifndef IFS_XFS_FIRMWARE
                | IFS_FS_VOLUME_FORMAT
 #endif
     },
-    .query = query_volume
+    .query = query_volume, .label=volume_label
 #ifndef IFS_XFS_FIRMWARE
     ,.format = format_volume
 #endif

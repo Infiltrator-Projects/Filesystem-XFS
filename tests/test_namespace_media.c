@@ -125,6 +125,13 @@ int main(int argc, char **argv)
     if (rc != IFS_FS_OK)
         fprintf(stderr, "mount returned %d, image %s\n", rc, argv[2]);
     CHECK(rc == IFS_FS_OK && mount && info.total_bytes <= host.volume_bytes);
+    /* Compare the provider's label against the independently read SB field. */
+    char expected_label[13]={0},actual_label[13]={0};
+    uint32_t label_bytes=UINT32_MAX;
+    CHECK(pread(device.fd,expected_label,12u,108u)==12);
+    CHECK(vol->label && !vol->set_label &&
+          vol->label(mount,actual_label,sizeof(actual_label),&label_bytes)==IFS_FS_OK &&
+          label_bytes==strlen(expected_label) && !strcmp(actual_label,expected_label));
     if (!strcmp(argv[5], "bad-bmap")) {
         char byte;
         CHECK(core->read(mount, "/fragmented/extent", 0, &byte, 1) == IFS_FS_CORRUPT);

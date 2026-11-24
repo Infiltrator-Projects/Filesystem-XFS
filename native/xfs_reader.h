@@ -10,6 +10,7 @@ typedef struct {
     uint16_t inode_bytes, sector_bytes;
     uint8_t ag_log, inop_log, dir_log, v5, ftype, sparse;
     uint8_t uuid[16], metadata_uuid[16];
+    uint8_t label[12];
 } XfsReader;
 
 int xfs_reader_configure(XfsReader *, const IfsFsHostRuntimeV2 *, const uint8_t *);

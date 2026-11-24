@@ -62,6 +62,8 @@ int xfs_reader_configure(XfsReader *r, const IfsFsHostRuntimeV2 *host, const uin
     r->sparse = !!(incompat & 2u);
     r->ftype = r->v5 ? !!(incompat & 1u) : !!(xfs_be32(sb + 200) & 0x200u);
     memcpy(r->uuid, sb + 32, 16);
+    /* sb_fname is exactly 12 bytes, not necessarily NUL terminated. */
+    memcpy(r->label,sb+108u,sizeof(r->label));
     memcpy(r->metadata_uuid, incompat & 4u ? sb + 248 : sb + 32, 16);
     if (!r->root || !r->log_blocks)
         return IFS_FS_CORRUPT;

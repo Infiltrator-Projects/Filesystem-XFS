@@ -28,7 +28,7 @@ int main(void){
     CHECK(core && core->probe && core->mount && core->unmount &&
           vol && vol->query && !core->write);
     CHECK(core->header.capabilities==(IFS_FS_CORE_PROBE|IFS_FS_CORE_MOUNT|IFS_FS_CORE_STAT|IFS_FS_CORE_LIST|IFS_FS_CORE_READ));
-    CHECK(vol->header.capabilities==(IFS_FS_VOLUME_QUERY|IFS_FS_VOLUME_FORMAT) && vol->format);
+    CHECK(vol->header.capabilities==(IFS_FS_VOLUME_QUERY|IFS_FS_VOLUME_FORMAT|IFS_FS_VOLUME_LABEL_GET) && vol->format && vol->label && !vol->set_label);
     IfsFsHostRuntimeV2 h={0};
     h.abi_version=IFS_FS_HOST_ABI_V2;h.structure_bytes=sizeof(h);
     h.capabilities=IFS_FS_HOST_READ_ONLY;h.volume_bytes=sizeof(disk);

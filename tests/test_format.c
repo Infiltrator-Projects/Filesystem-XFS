@@ -71,6 +71,13 @@ int main(int argc,char **argv)
     CHECK(core->mount(&ro,&mount,&info)==IFS_FS_OK && mount);
     CHECK(info.variant==variant && info.total_bytes==m.bytes &&
           info.free_bytes==m.bytes-(16384u+24u)*4096u);
+    char label[13],tiny[2]={'X','X'};
+    uint32_t label_bytes=0;
+    CHECK(vol->label && !vol->set_label &&
+          vol->label(mount,label,sizeof(label),&label_bytes)==IFS_FS_OK &&
+          label_bytes==9u && !strcmp(label,"NativeXFS"));
+    CHECK(vol->label(mount,tiny,sizeof(tiny),&label_bytes)==IFS_FS_NO_SPACE &&
+          !label_bytes && tiny[0]=='X' && tiny[1]=='X');
     CHECK(core->stat(mount,"/",&entry)==IFS_FS_OK && entry.type==IFS_FS_ENTRY_DIRECTORY);
     CHECK(core->directory_entry(mount,"/",0u,&entry)==IFS_FS_END);
     CHECK(vol->format(&h,variant,"NativeXFS",0u)==IFS_FS_BUSY);
