@@ -396,6 +396,8 @@ static int format_impl(const IfsFsHostRuntimeV2 *h,const char *label)
             const unsigned index=b*8u+i;
             uint8_t *ino=block+512u*i;
             xfs_put_be16(ino,0x494eu);ino[4]=3u;ino[5]=2u;
+            /* An absent attribute fork still uses the extents format. */
+            ino[83]=2u;
             xfs_put_be32(ino+92,index+1u);xfs_put_be32(ino+96,UINT32_MAX);
             xfs_put_be64(ino+152,64u+index);memcpy(ino+160,uuid,16u);
             if(index<3u) {
