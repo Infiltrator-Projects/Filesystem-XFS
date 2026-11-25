@@ -1,5 +1,13 @@
 # XFS Design and Ownership
 
+## Current production architecture
+
+The independent `XFS.so` is the canonical installed filesystem provider. Common V2 declares probe, mount, stat, list and read, with VOLUME format in hosted scope. The embedded reader uses the same namespace implementation. Qualification includes 4Kn transfers and contradictory geometry with recomputed metadata checksums. The canonical entry point is `infiltrator_filesystem_api_v2`. Consumers must negotiate the actual profile and operation masks and use bounded, partition-relative host I/O. A source-level callback does not by itself establish that every format variant or host profile is qualified.
+
+The hosted and freestanding profiles are qualified separately. Only the shared object and its technical PDF are installed by the filesystem package; the native RUN downloads its exact source revision. No separate per-format kernel or EFI driver or FUSE substitute is a production delivery path. See the [current README](../../../README.md) and [migration evidence](../../../MIGRATION_STATUS.md) for exact scope and qualification. The inherited design and source-ownership record below is historical where it describes older source layouts, implementation status or adapters; it remains valuable for format semantics and attribution.
+
+## Historical design and source record
+
 > **Working source (23 October 2026).** This filesystem's `linux/` directory contains the actual copied Linux implementation source, preserved with its original attribution and available for direct modification. It is not a replaceable research-only reference tree. The old independently-rewrite-first policy and any old directory-layout/refresh language below are historical, not a restriction on editing this working baseline. Only explicitly qualified drivers appear in `data/native-filesystems.tsv`.
 
 
@@ -10,9 +18,9 @@ therefore applies the one-canonical-filesystem architecture: persistent XFS
 format and filesystem semantics belong in a host-neutral core, while operating
 systems expose that core through thin adapters.
 
-## Current implementation state
+## Historical implementation state
 
-XFS is currently **imported-source development state**.
+XFS was originally documented as **imported-source development state**.
 
 There is no project-authored canonical XFS engine and no Filesystems XFS
 native module claimed by this directory. The source under `linux/`
@@ -24,7 +32,7 @@ implementation boundaries. Relocating the unchanged Linux tree from the old
 `kernel/` staging path to `linux/` is provenance/layout hygiene
 only; it is not an implementation rewrite and does not change authorship.
 
-## Current directory layout
+## Historical directory layout
 
 ```text
 native/filesystems/xfs/
