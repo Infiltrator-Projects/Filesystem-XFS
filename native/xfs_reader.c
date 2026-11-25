@@ -606,6 +606,52 @@ int xfs_reader_list(const XfsReader *r, const char *path, uint32_t index, IfsFsE
         rc = match_inode(r, &s, &inode);
     return rc ? rc : fill(&inode, &s, out);
 }
+/* Native data-fork extent mapping for dense initialized streams. The same
+ * verified AG addressing and bmap traversal as CORE.READ owns all decoding.
+ * Common V2 has no qualified hole/unwritten flag contract here, so such
+ * streams fail closed rather than invent a physical offset. */
+int xfs_reader_map(const XfsReader *r,const char *path,uint64_t first,
+                   IfsFsExtentV2 *out,uint32_t capacity,uint32_t *written)
+{
+    if(!written)return IFS_FS_INVALID;
+    *written=0u;
+    if(!r || !out || !capacity)return IFS_FS_INVALID;
+    Inode inode;
+    Search s;
+    int rc=resolve(r,path,&inode,&s);
+    if(rc)return rc;
+    if(inode.mode!=MODE_REG)return IFS_FS_UNSUPPORTED;
+    if(!inode.size)return IFS_FS_END;
+    if(!inode.extents)return IFS_FS_UNSUPPORTED;
+    uint64_t pos=0u,index=0u;
+    uint32_t count=0u;
+    while(pos<inode.size) {
+        if(index>=inode.extents || pos%r->block_bytes)return IFS_FS_CORRUPT;
+        Run run;
+        rc=extent_at(r,&inode,pos/r->block_bytes,&run);
+        if(rc)return rc;
+        if(run.unwritten)return IFS_FS_UNSUPPORTED;
+        if(run.logical!=pos/r->block_bytes || !run.length ||
+           run.length>UINT64_MAX/r->block_bytes ||
+           run.disk>UINT64_MAX/r->block_bytes)return IFS_FS_CORRUPT;
+        uint64_t length=run.length*r->block_bytes;
+        uint64_t physical_offset=run.disk*r->block_bytes;
+        if(length>inode.size-pos)length=inode.size-pos;
+        if(physical_offset>r->host.volume_bytes ||
+           length>r->host.volume_bytes-physical_offset)return IFS_FS_CORRUPT;
+        if(index>=first && count<capacity) {
+            out[count++]=(IfsFsExtentV2){.logical_offset=pos,
+                .physical_offset=physical_offset,.length=length};
+        }
+        pos+=length;
+        ++index;
+    }
+    /* Validate the complete logical stream even when returning one page.
+     * A malformed later bmap leaf must not become a successful short page. */
+    *written=count;
+    return count?IFS_FS_OK:IFS_FS_END;
+}
+
 int xfs_reader_read(const XfsReader *r, const char *path, uint64_t offset, void *out,
                     uint32_t bytes)
 {

@@ -519,6 +519,24 @@ static const IfsFsVolumeOpsV2 volume_ops = {
     ,.format = format_volume
 #endif
 };
+#ifndef IFS_XFS_FIRMWARE
+/* Only hosted Common V2 advertises file extent mapping. No writer or
+ * relocation capability is inferred from the read-only data fork. */
+static int map_file(void *handle,const char *path,uint64_t first,
+                    IfsFsExtentV2 *out,uint32_t capacity,uint32_t *written)
+{
+    if(!written)return IFS_FS_INVALID;
+    *written=0u;
+    Mount *m=acquire(handle);
+    return m?finished(m,xfs_reader_map(m->reader,path,first,out,capacity,written)):
+             IFS_FS_INVALID;
+}
+static const IfsFsDefragOpsV2 defrag_ops={
+    .header={IFS_FS_GROUP_ABI_V2,sizeof(defrag_ops),IFS_FS_GROUP_DEFRAG,0u,
+             IFS_FS_DEFRAG_MAP},
+    .map=map_file
+};
+#endif
 static const IfsFsCoreOpsV2 core = {
     .header = {IFS_FS_GROUP_ABI_V2, sizeof(IfsFsCoreOpsV2), IFS_FS_GROUP_CORE, 0u,
                IFS_FS_CORE_PROBE | IFS_FS_CORE_MOUNT | IFS_FS_CORE_STAT | IFS_FS_CORE_LIST |
@@ -538,6 +556,9 @@ static const IfsFsGroupHeaderV2 *query(uint32_t group, uint32_t lo, uint32_t hi)
     if (group == IFS_FS_GROUP_VOLUME)
         return &volume_ops.header;
     if (group == IFS_FS_GROUP_METADATA) return &metadata_ops.header;
+#ifndef IFS_XFS_FIRMWARE
+    if (group == IFS_FS_GROUP_DEFRAG) return &defrag_ops.header;
+#endif
     return NULL;
 }
 static const IfsFsModuleApiV2 api = {
@@ -550,7 +571,11 @@ static const IfsFsModuleApiV2 api = {
     .runtime_profiles = IFS_FS_PROFILE_HOSTED,
 #endif
     .group_mask = IFS_FS_GROUP_BIT(IFS_FS_GROUP_CORE) | IFS_FS_GROUP_BIT(IFS_FS_GROUP_VOLUME) |
-                  IFS_FS_GROUP_BIT(IFS_FS_GROUP_METADATA),
+                  IFS_FS_GROUP_BIT(IFS_FS_GROUP_METADATA)
+#ifndef IFS_XFS_FIRMWARE
+                  | IFS_FS_GROUP_BIT(IFS_FS_GROUP_DEFRAG)
+#endif
+                  ,
     .query_group = query};
 __attribute__((visibility("default"))) const IfsFsModuleApiV2 *infiltrator_filesystem_api_v2(void)
 {

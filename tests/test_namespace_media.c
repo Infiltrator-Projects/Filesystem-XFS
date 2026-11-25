@@ -78,6 +78,42 @@ static int check_file(const IfsFsCoreOpsV2 *core, void *mount, const char *sourc
     CHECK(!close(fd));
     return 0;
 }
+/* Compare each mapped physical byte directly against the independent
+ * input file, not just CORE.READ (which shares the same native parser). */
+static int check_dense_map(const IfsFsDefragOpsV2 *map,void *mount,int image,
+                           const char *source,const char *name)
+{
+    char local[1024],path[300];
+    CHECK(snprintf(local,sizeof(local),"%s/boot/%s",source,name)<(int)sizeof(local));
+    CHECK(snprintf(path,sizeof(path),"/boot/%s",name)<(int)sizeof(path));
+    int fd=open(local,O_RDONLY);
+    struct stat st;
+    CHECK(fd>=0 && !fstat(fd,&st));
+    uint64_t logical=0u;
+    uint8_t actual[8192],expected[8192];
+    for(uint64_t first=0u;;++first) {
+        IfsFsExtentV2 e={0};
+        uint32_t count=99u;
+        int rc=map->map(mount,path,first,&e,1u,&count);
+        if(rc==IFS_FS_END) {
+            CHECK(count==0u && logical==(uint64_t)st.st_size);
+            break;
+        }
+        CHECK(rc==IFS_FS_OK && count==1u && e.logical_offset==logical &&
+              e.length && !e.flags && !e.reserved &&
+              e.length<=(uint64_t)st.st_size-logical);
+        for(uint64_t at=0u;at<e.length;) {
+            size_t n=e.length-at<sizeof(actual)?(size_t)(e.length-at):sizeof(actual);
+            CHECK(pread(image,actual,n,(off_t)(e.physical_offset+at))==(ssize_t)n);
+            CHECK(pread(fd,expected,n,(off_t)(logical+at))==(ssize_t)n);
+            CHECK(!memcmp(actual,expected,n));
+            at+=n;
+        }
+        logical+=e.length;
+    }
+    CHECK(!close(fd));
+    return 0;
+}
 int main(int argc, char **argv)
 {
     CHECK(argc == 6);
@@ -95,6 +131,10 @@ int main(int argc, char **argv)
     const IfsFsVolumeOpsV2 *vol = (const void *)ifs_fs_group_v2(api, IFS_FS_GROUP_VOLUME);
     CHECK(core && core->stat && core->directory_entry && core->read && !core->write && vol &&
           vol->query);
+    const IfsFsDefragOpsV2 *map=(const void *)ifs_fs_group_v2(api,IFS_FS_GROUP_DEFRAG);
+    if(api->runtime_profiles&IFS_FS_PROFILE_HOSTED)
+        CHECK(map && map->header.capabilities==IFS_FS_DEFRAG_MAP && map->map);
+    else CHECK(!map);
     Device device = {open(argv[2], O_RDONLY), (uint32_t)strtoul(argv[4], NULL, 10), 0};
     struct stat st;
     CHECK(device.fd >= 0 && !fstat(device.fd, &st));
@@ -211,6 +251,13 @@ int main(int argc, char **argv)
               !check_file(core, mount, argv[3], "initramfs") &&
               !check_file(core, mount, argv[3], "inline"));
         CHECK(!unmount_during_read && observed_unmount==IFS_FS_BUSY);
+        if(map) {
+            CHECK(!check_dense_map(map,mount,device.fd,argv[3],"vmlinuz"));
+            IfsFsExtentV2 e={0};
+            uint32_t count=99u;
+            CHECK(map->map(mount,"/boot/missing",0u,&e,1u,&count)==IFS_FS_NOT_FOUND &&
+                  count==0u);
+        }
         if (seen & 8)
             CHECK(!check_file(core, mount, argv[3], "sparse"));
         strcpy(name, "sentinel");
