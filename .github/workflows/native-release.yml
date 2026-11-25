@@ -20,6 +20,11 @@ jobs:
         run: |
           set -euo pipefail
           python3 standalone/release.py release
+          bootstrap="$(find dist -maxdepth 1 -type f -name '*.run' -print -quit)"
+          test -s "$bootstrap"
+          test "$(wc -c < "$bootstrap")" -lt 8192
+          if grep -aF '__IFS_SOURCE_PAYLOAD_BELOW__' "$bootstrap"; then exit 1; fi
+          grep -F "$GITHUB_SHA" "$bootstrap"
           python3 standalone/check-package.py dist/*.deb --profile portable
           test "$(find dist -maxdepth 1 -name '*.deb' | wc -l)" = 1
           test "$(find dist -maxdepth 1 -name '*.run' | wc -l)" = 1
@@ -113,10 +118,11 @@ jobs:
             exit 1
           fi
           (cd dist && sha256sum -- *.deb *.run > SHA256SUMS.txt && sha256sum -c SHA256SUMS.txt)
-          gh release create "$tag" dist/*.deb dist/*.run dist/SHA256SUMS.txt \
+          gh release create "$tag" dist/*.deb dist/*.run \
             --target "$GITHUB_SHA" \
             --title "XFS native Common V2 filesystem reader $version" \
             --notes "V2-only XFS.so with embedded freestanding read-only reader; portable DEB and native source RUN. Verified packaged namespace, kernel/initramfs, dirty-log and corrupted metadata images. No Linux kernel fallback. Full future BOOT/OVMF integration is not claimed."
           mkdir -p "$RUNNER_TEMP/released"
-          gh release download "$tag" --dir "$RUNNER_TEMP/released"
+          gh release download "$tag" -p '*.deb' -p '*.run' --dir "$RUNNER_TEMP/released"
+          cp dist/SHA256SUMS.txt "$RUNNER_TEMP/released/"
           (cd "$RUNNER_TEMP/released" && sha256sum -c SHA256SUMS.txt)
