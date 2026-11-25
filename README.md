@@ -1,9 +1,36 @@
 # Filesystem-XFS
 
-The XFS provider exports `infiltrator_filesystem_api_v2`. It detects XFS v4 and v5, checks superblock geometry, verifies the complete v5 superblock CRC32C and provides read-only mounting, file status, path traversal, directory enumeration and file reads. The installed carrier embeds the same reader in an import-free firmware ELF.
+## 1. Purpose and format scope
 
-The reader checks the internal journal for a clean unmount, verifies allocation through the inode B+tree and reads shortform and data directories. It follows direct extents and native bmap trees, including sparse and unwritten ranges. V5 metadata checksums cover the superblock, allocation metadata, inodes, directory blocks, bmap blocks and journal records used by the reader. Regular XFS file data has no native checksum. External logs, realtime volumes, ASCII case-insensitive lookup, symlink traversal and journal replay are unsupported.
+XFS v4 and v5, with native allocation-group structures. This repository owns the format-specific implementation of `XFS.so` for InfiltratorOS.
 
-The portable Debian package and CPU-native installer built from this revision install `/System/Filesystems/XFS.so` and `/System/Resources/Documentation/Filesystem-XFS.pdf`. Historical metadata and mutation engines remain in the source tree and its regression tests.
+## 2. On-disk architecture and invariants
 
-CI formats disposable images with xfsprogs, probes and mounts them through the packaged V2 interface, and verifies their hashes. A disposable Linux guest creates a fragmented sparse file and a separate volume requiring replay. CI compares the kernel and initramfs through the hosted and extracted firmware ELF for both package profiles. Production BOOT acceptance is pending. It tests both damaged checksums and independently re-checksummed contradictory geometry.
+Validate superblock geometry, v5 CRC32C, internal log state and inode allocation through the inode B+tree. Shortform and data directories, direct extents and bmap trees govern mapping. Sparse and unwritten ranges must not expose stale media contents. Reject unsupported log formats; ordinary XFS file data has no native checksum.
+
+## 3. Common V2 implementation and capabilities
+
+Common V2 declares probe, mount, stat, list and read, with VOLUME format in hosted scope. The embedded reader uses the same namespace implementation. Qualification includes 4Kn transfers and contradictory geometry with recomputed metadata checksums. The canonical entry point is `infiltrator_filesystem_api_v2`. Consumers must negotiate the actual profile and operation masks and use bounded, partition-relative host I/O. A source-level callback does not by itself establish that every format variant or host profile is qualified.
+
+## 4. Integrity, mutation, allocation and recovery
+
+External logs, realtime volumes, ASCII case-insensitive lookup, symlink traversal and journal replay are outside the documented reader scope. General writable namespace and relocation remain separate qualifications. For destructive operations, require the applicable exclusive writable host, durability contract and format-specific validation. Never silently substitute a kernel or FUSE driver or treat a rejected or unavailable operation as success. Preserve original disk-format semantics; relocation and recovery are separate from ordinary file I/O.
+
+## 5. Build, installation and release
+
+The target installation is `/System/Filesystems/XFS.so` and `/System/Resources/Documentation/Filesystem-XFS.pdf`. The project release policy is a portable amd64 DEB and a CPU-native source-first RUN, with GitHub's automatic source archive; do not treat this policy statement as verification of the current installer payload. The release workflow is the authoritative executable build and package specification. Historical adapters and test artifacts are not additional production filesystem authorities.
+
+## 6. Qualification and limitations
+
+[Recorded qualification workflow](https://github.com/Infiltrator-Projects/Filesystem-XFS/actions/runs/45520161633) · [Current workflows](https://github.com/Infiltrator-Projects/Filesystem-XFS/actions?query=branch%3Amain). A successful workflow establishes the tested scope only, not complete original-format parity, physical-media crash safety, or production BOOT/kernel integration. Use disposable images for destructive qualification.
+
+## 7. Technical references and provenance
+
+- [Provider implementation](module/xfs_v2_probe.c)
+- [Native design or source provenance](native/filesystems/xfs/DESIGN.md)
+- [Migration and source history](MIGRATION_STATUS.md)
+- [Original-format reference source](docs/XFS.pages) and [PDF](docs/XFS.pdf)
+- [Project philosophy](docs/PHILOSOPHY.md)
+- [Common ABI](https://github.com/Infiltrator-Projects/Libraries)
+
+The original-format reference and historical migration notes describe different evidence from the current production provider. When descriptions disagree, the current exported descriptor, implementation, executable tests and exact-revision release evidence take precedence.
