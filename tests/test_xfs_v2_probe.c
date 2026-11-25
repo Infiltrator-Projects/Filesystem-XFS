@@ -8,9 +8,12 @@ extern const IfsFsModuleApiV2 *infiltrator_filesystem_api_v2(void);
 /* Canonical CRC implementation in the source-owned XFS engine. */
 extern void xfs_write_crc_le(uint8_t *data,size_t length,size_t field);
 static uint8_t disk[1048576];
+static uint32_t host_sector=512u;
+static int fail_read;
 static int reader(void *ctx,uint64_t at,void *out,uint32_t n){
     (void)ctx;
-    if(n!=512u || at>sizeof(disk) || n>sizeof(disk)-at) return -1;
+    if(fail_read || n!=host_sector || at%host_sector ||
+       at>sizeof(disk) || n>sizeof(disk)-at) return -1;
     memcpy(out,disk+(size_t)at,n);return 0;
 }
 static void *alloc(void *c,size_t n){(void)c;return malloc(n);}
@@ -69,6 +72,27 @@ int main(void){
     be32(disk+216u,0u);
     xfs_write_crc_le(disk,4096u,224u);
     CHECK(core->probe(&h,&variant)==IFS_FS_OK && variant==5u);
+    /* A future log format must be recognised as unsupported, never
+     * interpreted as a clean, mountable v5 filesystem. */
+    be32(disk+220u,1u);
+    xfs_write_crc_le(disk,4096u,224u);
+    CHECK(core->probe(&h,&variant)==IFS_FS_UNSUPPORTED && variant==0u);
+    be32(disk+220u,0u);
+    xfs_write_crc_le(disk,4096u,224u);
+    /* The same on-media superblock must probe on a strict 4Kn host
+     * without submitting a 512-byte read to that host. */
+    host_sector=4096u;
+    h.logical_sector_bytes=4096u;
+    h.physical_sector_bytes=4096u;
+    h.maximum_transfer_bytes=4096u;
+    CHECK(core->probe(&h,&variant)==IFS_FS_OK && variant==5u);
+    fail_read=1;
+    CHECK(core->probe(&h,&variant)==IFS_FS_IO_ERROR && variant==0u);
+    fail_read=0;
+    host_sector=512u;
+    h.logical_sector_bytes=512u;
+    h.physical_sector_bytes=512u;
+    h.maximum_transfer_bytes=512u;
     disk[1024]^=1u;variant=0;
     CHECK(core->probe(&h,&variant)==IFS_FS_CORRUPT && variant==0);
     disk[1024]^=1u;

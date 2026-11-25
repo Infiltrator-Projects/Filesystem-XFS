@@ -106,7 +106,11 @@ static int inspect(const IfsFsHostRuntimeV2 *h, uint32_t *variant, IfsFsVolumeIn
          * interpret. Retain known v5 FTYPE/SPINODES/META_UUID/BIGTIME/
          * NREXT64 superblocks for read-only metadata recognition only. */
         const uint32_t incompat = xfs_be32(sb + 216u);
-        if ((incompat & ~UINT32_C(0x2f)) || (incompat & UINT32_C(0x10))) {
+        /* A log-incompatible feature must not be reported as a fully
+         * supported volume by PROBE when the namespace reader cannot
+         * replay it or interpret the associated metadata. */
+        if ((incompat & ~UINT32_C(0x2f)) || (incompat & UINT32_C(0x10)) ||
+            xfs_be32(sb + 220u)) {
             result = IFS_FS_UNSUPPORTED;
             goto done;
         }
