@@ -78,6 +78,26 @@ int main(int argc,char **argv)
           label_bytes==9u && !strcmp(label,"NativeXFS"));
     CHECK(vol->label(mount,tiny,sizeof(tiny),&label_bytes)==IFS_FS_NO_SPACE &&
           !label_bytes && tiny[0]=='X' && tiny[1]=='X');
+    const IfsFsAllocationOpsV2 *allocation=(const void*)ifs_fs_group_v2(api,IFS_FS_GROUP_ALLOCATION);
+    CHECK(allocation && allocation->map);
+    uint64_t at=0u,unknown=0u,free_bytes=0u,reserved=0u,used=0u;
+    for(;;) {
+        IfsFsAllocationRangeV2 page[2]={{0}};
+        uint32_t written=99u;uint64_t next=at;
+        int rc=allocation->map(mount,at,page,2u,&written);
+        CHECK(ifs_fs_allocation_page_v2_valid(m.bytes,at,rc,page,2u,written,&next,&unknown));
+        if(rc==IFS_FS_END)break;
+        for(uint32_t i=0;i<written;++i) {
+            if(page[i].state==IFS_FS_SPACE_FREE)free_bytes+=page[i].length;
+            if(page[i].state==IFS_FS_SPACE_RESERVED)reserved+=page[i].length;
+            if(page[i].state==IFS_FS_SPACE_ALLOCATED)used+=page[i].length;
+        }
+        CHECK(next>at);at=next;
+    }
+    /* Four AGFL blocks in each of the four formatter-owned AGs count
+     * in sb_fdblocks but must not be advertised as ordinary free space. */
+    CHECK(at==m.bytes && !unknown && reserved==16u*4096u &&
+          free_bytes+reserved==info.free_bytes && used+reserved+free_bytes==m.bytes);
     CHECK(core->stat(mount,"/",&entry)==IFS_FS_OK && entry.type==IFS_FS_ENTRY_DIRECTORY);
     CHECK(core->directory_entry(mount,"/",0u,&entry)==IFS_FS_END);
     CHECK(vol->format(&h,variant,"NativeXFS",0u)==IFS_FS_BUSY);

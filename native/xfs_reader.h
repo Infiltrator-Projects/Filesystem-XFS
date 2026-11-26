@@ -20,4 +20,6 @@ int xfs_reader_stat(const XfsReader *, const char *, IfsFsEntryV2 *);
 int xfs_reader_list(const XfsReader *, const char *, uint32_t, IfsFsEntryV2 *);
 int xfs_reader_read(const XfsReader *, const char *, uint64_t, void *, uint32_t);
 int xfs_reader_map(const XfsReader *,const char *,uint64_t,IfsFsExtentV2 *,uint32_t,uint32_t *);
+int xfs_reader_allocation(const XfsReader *,uint64_t,IfsFsAllocationRangeV2 *,
+                          uint32_t,uint32_t *);
 #endif

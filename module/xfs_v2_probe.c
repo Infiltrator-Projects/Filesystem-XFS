@@ -531,6 +531,20 @@ static int map_file(void *handle,const char *path,uint64_t first,
     return m?finished(m,xfs_reader_map(m->reader,path,first,out,capacity,written)):
              IFS_FS_INVALID;
 }
+static int allocation_map(void *handle,uint64_t first,IfsFsAllocationRangeV2 *out,
+                          uint32_t capacity,uint32_t *written)
+{
+    if(!written)return IFS_FS_INVALID;
+    *written=0u;
+    Mount *m=acquire(handle);
+    return m?finished(m,xfs_reader_allocation(m->reader,first,out,capacity,written)):
+        IFS_FS_INVALID;
+}
+static const IfsFsAllocationOpsV2 allocation_ops={
+    .header={IFS_FS_GROUP_ABI_V2,sizeof(allocation_ops),IFS_FS_GROUP_ALLOCATION,0u,
+             IFS_FS_ALLOCATION_MAP},
+    .map=allocation_map
+};
 static const IfsFsDefragOpsV2 defrag_ops={
     .header={IFS_FS_GROUP_ABI_V2,sizeof(defrag_ops),IFS_FS_GROUP_DEFRAG,0u,
              IFS_FS_DEFRAG_MAP},
@@ -558,6 +572,7 @@ static const IfsFsGroupHeaderV2 *query(uint32_t group, uint32_t lo, uint32_t hi)
     if (group == IFS_FS_GROUP_METADATA) return &metadata_ops.header;
 #ifndef IFS_XFS_FIRMWARE
     if (group == IFS_FS_GROUP_DEFRAG) return &defrag_ops.header;
+    if (group == IFS_FS_GROUP_ALLOCATION) return &allocation_ops.header;
 #endif
     return NULL;
 }
@@ -573,7 +588,7 @@ static const IfsFsModuleApiV2 api = {
     .group_mask = IFS_FS_GROUP_BIT(IFS_FS_GROUP_CORE) | IFS_FS_GROUP_BIT(IFS_FS_GROUP_VOLUME) |
                   IFS_FS_GROUP_BIT(IFS_FS_GROUP_METADATA)
 #ifndef IFS_XFS_FIRMWARE
-                  | IFS_FS_GROUP_BIT(IFS_FS_GROUP_DEFRAG)
+                  | IFS_FS_GROUP_BIT(IFS_FS_GROUP_DEFRAG) | IFS_FS_GROUP_BIT(IFS_FS_GROUP_ALLOCATION)
 #endif
                   ,
     .query_group = query};

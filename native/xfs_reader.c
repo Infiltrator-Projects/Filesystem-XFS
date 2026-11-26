@@ -832,3 +832,209 @@ int xfs_reader_check_root(const XfsReader *r)
     rc = lookup(r, &root, &first);
     return rc == IFS_FS_END ? IFS_FS_OK : rc;
 }
+
+/* Native AG allocation inventory. Both independent free-space indexes must
+ * enumerate precisely the same blocks. AGFL is reserved for allocator
+ * metadata, not ordinary file growth. A page is private until validated.
+ * Use one bounded AG inventory at a time rather than a whole-device bitmap.
+ */
+enum { ALLOC_BNO=1u, ALLOC_CNT=2u, ALLOC_META=4u, ALLOC_RESERVED=8u };
+typedef struct {
+    const XfsReader *r;
+    uint8_t *state;
+    uint64_t base;
+    uint32_t ag,length,header_blocks;
+    uint64_t count;
+    uint32_t longest,last_start,last_length;
+    int previous;
+} AllocationScan;
+
+static int reserve_blocks(AllocationScan *s,uint32_t start,uint32_t count,unsigned state)
+{
+    if(start>=s->length || !count || count>s->length-start)return IFS_FS_CORRUPT;
+    for(uint32_t i=0;i<count;++i) {
+        if(s->state[start+i])return IFS_FS_CORRUPT;
+        s->state[start+i]=(uint8_t)state;
+    }
+    return IFS_FS_OK;
+}
+static int allocation_tree(AllocationScan *s,uint32_t node,uint32_t depth,unsigned kind)
+{
+    const XfsReader *r=s->r;
+    if(!depth || depth>16u || !node || node>=s->length ||
+       s->state[node])return IFS_FS_CORRUPT;
+    s->state[node]=ALLOC_META;
+    if(r->host.cancelled && r->host.cancelled(r->host.context))return IFS_FS_BUSY;
+    uint8_t *p=r->host.allocate(r->host.context,r->block_bytes);
+    if(!p)return IFS_FS_NO_MEMORY;
+    const uint64_t at=(s->base+node)*r->block_bytes;
+    int rc=ifs_fs_host_read_bytes_v2(&r->host,at,p,r->block_bytes);
+    if(rc)goto done;
+    rc=IFS_FS_CORRUPT;
+    const uint32_t magic=kind==ALLOC_BNO?
+        (r->v5?0x41423342u:0x41425442u):(r->v5?0x41423343u:0x41425443u);
+    const uint32_t header=r->v5?56u:16u;
+    if(xfs_be32(p)!=magic || xfs_be16(p+4)!=depth-1u)goto done;
+    if(r->v5 && (xfs_be64(p+16)!=at/512u ||
+       memcmp(p+32,r->metadata_uuid,16u) || xfs_be32(p+48)!=s->ag ||
+       infiltratr_load_le32(p+52)!=xfs_crc_field(p,r->block_bytes,52u)))goto done;
+    const uint32_t count=xfs_be16(p+6);
+    const uint32_t maximum=(r->block_bytes-header)/(depth>1u?12u:8u);
+    if(count>maximum || (!count && depth>1u))goto done;
+    uint32_t prior_start=0u,prior_length=0u;
+    for(uint32_t i=0;i<count;++i) {
+        const uint8_t *record=p+header+8u*i;
+        const uint32_t start=xfs_be32(record),length=xfs_be32(record+4u);
+        if(start<s->header_blocks || start>=s->length || !length ||
+           length>s->length-start)goto done;
+        if(i && (kind==ALLOC_BNO?start<=prior_start:
+           (length<prior_length || (length==prior_length && start<=prior_start))))goto done;
+        prior_start=start;prior_length=length;
+        if(depth>1u) {
+            const uint32_t child=xfs_be32(p+header+maximum*8u+4u*i);
+            rc=allocation_tree(s,child,depth-1u,kind);
+            if(rc)goto done;
+            rc=IFS_FS_CORRUPT;
+            continue;
+        }
+        if(s->previous && (kind==ALLOC_BNO?
+           start<(uint64_t)s->last_start+s->last_length:
+           (length<s->last_length || (length==s->last_length && start<=s->last_start))))goto done;
+        for(uint32_t j=0u;j<length;++j) {
+            uint8_t *v=&s->state[start+j];
+            if((*v&kind) || (*v&(ALLOC_META|ALLOC_RESERVED)))goto done;
+            *v|=(uint8_t)kind;
+        }
+        s->count+=length;
+        if(length>s->longest)s->longest=length;
+        s->last_start=start;s->last_length=length;s->previous=1;
+    }
+    rc=IFS_FS_OK;
+done:
+    r->host.release(r->host.context,p);
+    return rc;
+}
+static int allocation_group(AllocationScan *s)
+{
+    const XfsReader *r=s->r;
+    uint8_t *agf=r->host.allocate(r->host.context,r->sector_bytes);
+    uint8_t *fl=r->host.allocate(r->host.context,r->sector_bytes);
+    if(!agf || !fl) {
+        if(agf)r->host.release(r->host.context,agf);
+        if(fl)r->host.release(r->host.context,fl);
+        return IFS_FS_NO_MEMORY;
+    }
+    const uint64_t at=s->base*r->block_bytes;
+    int rc=ifs_fs_host_read_bytes_v2(&r->host,at+r->sector_bytes,agf,r->sector_bytes);
+    if(rc)goto done;
+    rc=IFS_FS_CORRUPT;
+    if(memcmp(agf,"XAGF",4u) || xfs_be32(agf+4)!=1u ||
+       xfs_be32(agf+8)!=s->ag || xfs_be32(agf+12)!=s->length)goto done;
+    if(r->v5 && (memcmp(agf+64,r->metadata_uuid,16u) ||
+       infiltratr_load_le32(agf+216)!=xfs_crc_field(agf,r->sector_bytes,216u)))goto done;
+    const uint32_t shift=r->v5?8u:0u;
+    const uint32_t first=xfs_be32(agf+32u+shift),last=xfs_be32(agf+36u+shift);
+    const uint32_t count=xfs_be32(agf+40u+shift);
+    const uint32_t free_count=xfs_be32(agf+44u+shift),longest=xfs_be32(agf+48u+shift);
+    const uint32_t fl_header=r->v5?36u:0u;
+    const uint32_t fl_cap=(r->sector_bytes-fl_header)/4u;
+    if(!fl_cap || count>fl_cap || free_count>s->length || longest>free_count ||
+       (count && (first>=fl_cap || last>=fl_cap ||
+                  (first+count-1u)%fl_cap!=last)))goto done;
+    rc=reserve_blocks(s,0u,s->header_blocks,ALLOC_META);
+    if(rc)goto done;
+    uint64_t log;
+    rc=physical(r,r->log_start,r->log_blocks,&log);
+    if(rc)goto done;
+    if(log>=s->base && log-s->base<s->length) {
+        rc=reserve_blocks(s,(uint32_t)(log-s->base),r->log_blocks,ALLOC_META);
+        if(rc)goto done;
+    }
+    rc=ifs_fs_host_read_bytes_v2(&r->host,at+3u*r->sector_bytes,fl,r->sector_bytes);
+    if(rc)goto done;
+    rc=IFS_FS_CORRUPT;
+    if(r->v5 && (memcmp(fl,"XAFL",4u) || xfs_be32(fl+4)!=s->ag ||
+       memcmp(fl+8,r->metadata_uuid,16u) ||
+       infiltratr_load_le32(fl+32)!=xfs_crc_field(fl,r->sector_bytes,32u)))goto done;
+    for(uint32_t i=0;i<count;++i) {
+        uint32_t block=xfs_be32(fl+fl_header+4u*((first+i)%fl_cap));
+        rc=reserve_blocks(s,block,1u,ALLOC_RESERVED);
+        if(rc)goto done;
+    }
+    /* The inode-tree root is an independently identified metadata owner. */
+    rc=ifs_fs_host_read_bytes_v2(&r->host,at+2u*r->sector_bytes,fl,r->sector_bytes);
+    if(rc)goto done;
+    rc=IFS_FS_CORRUPT;
+    if(memcmp(fl,"XAGI",4u) || xfs_be32(fl+4)!=1u ||
+       xfs_be32(fl+8)!=s->ag || xfs_be32(fl+12)!=s->length)goto done;
+    if(r->v5 && (memcmp(fl+296,r->metadata_uuid,16u) ||
+       infiltratr_load_le32(fl+312)!=xfs_crc_field(fl,r->sector_bytes,312u)))goto done;
+    rc=reserve_blocks(s,xfs_be32(fl+20),1u,ALLOC_META);
+    if(rc)goto done;
+    rc=allocation_tree(s,xfs_be32(agf+16),xfs_be32(agf+24u+(r->v5?4u:0u)),ALLOC_BNO);
+    if(rc)goto done;
+    if(s->count!=free_count || s->longest!=longest){rc=IFS_FS_CORRUPT;goto done;}
+    s->count=0u;s->longest=0u;s->previous=0;
+    rc=allocation_tree(s,xfs_be32(agf+20),xfs_be32(agf+28u+(r->v5?4u:0u)),ALLOC_CNT);
+    if(rc)goto done;
+    if(s->count!=free_count || s->longest!=longest){rc=IFS_FS_CORRUPT;goto done;}
+    for(uint32_t i=0;i<s->length;++i)
+        if((s->state[i]&(ALLOC_BNO|ALLOC_CNT))!=0u &&
+           (s->state[i]&(ALLOC_BNO|ALLOC_CNT))!=(ALLOC_BNO|ALLOC_CNT)) {
+            rc=IFS_FS_CORRUPT;goto done;
+        }
+    rc=IFS_FS_OK;
+done:
+    r->host.release(r->host.context,fl);
+    r->host.release(r->host.context,agf);
+    return rc;
+}
+int xfs_reader_allocation(const XfsReader *r,uint64_t first,
+                          IfsFsAllocationRangeV2 *out,uint32_t capacity,uint32_t *written)
+{
+    if(!written)return IFS_FS_INVALID;
+    *written=0u;
+    if(!r || !out || !capacity || capacity>64u || first>r->host.volume_bytes)
+        return IFS_FS_INVALID;
+    const uint64_t fs_bytes=r->blocks*r->block_bytes;
+    if(first==r->host.volume_bytes)return IFS_FS_END;
+    if(first>=fs_bytes) {
+        out[0]=(IfsFsAllocationRangeV2){.physical_offset=first,
+            .length=r->host.volume_bytes-first,.state=IFS_FS_SPACE_RESERVED};
+        *written=1u;return IFS_FS_OK;
+    }
+    uint64_t block=first/r->block_bytes,ag=block/r->ag_blocks;
+    AllocationScan s={.r=r,.ag=(uint32_t)ag,.base=ag*r->ag_blocks};
+    s.length=(uint32_t)(r->blocks-s.base<r->ag_blocks?r->blocks-s.base:r->ag_blocks);
+    s.header_blocks=(4u*r->sector_bytes+r->block_bytes-1u)/r->block_bytes;
+    /* Avoid unbounded per-page allocations on unusually large AGs. */
+    if(s.length>64u*1024u*1024u)return IFS_FS_NO_MEMORY;
+    s.state=r->host.allocate(r->host.context,s.length);
+    if(!s.state)return IFS_FS_NO_MEMORY;
+    memset(s.state,0,s.length);
+    int rc=allocation_group(&s);
+    IfsFsAllocationRangeV2 page[64]={{0}};
+    uint32_t count=0u;
+    uint64_t at=first,end_ag=(s.base+s.length)*r->block_bytes;
+    if(rc)goto done;
+    while(at<end_ag) {
+        if(r->host.cancelled && r->host.cancelled(r->host.context)){rc=IFS_FS_BUSY;goto done;}
+        uint64_t physical_block=at/r->block_bytes;
+        uint8_t bits=s.state[physical_block-s.base];
+        uint32_t state=bits==(ALLOC_BNO|ALLOC_CNT)?IFS_FS_SPACE_FREE:
+            bits==ALLOC_RESERVED?IFS_FS_SPACE_RESERVED:IFS_FS_SPACE_ALLOCATED;
+        uint64_t end=(physical_block+1u)*r->block_bytes;
+        if(count && page[count-1u].state==state)page[count-1u].length+=end-at;
+        else {
+            if(count==capacity)break;
+            page[count++]=(IfsFsAllocationRangeV2){.physical_offset=at,
+                .length=end-at,.state=state};
+        }
+        at=end;
+    }
+    memcpy(out,page,count*sizeof(*page));*written=count;
+    rc=IFS_FS_OK;
+done:
+    r->host.release(r->host.context,s.state);
+    return rc;
+}
