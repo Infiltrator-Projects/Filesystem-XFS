@@ -8,7 +8,7 @@ typedef struct {
     uint64_t blocks, root, log_start;
     uint32_t block_bytes, ag_blocks, log_blocks;
     uint16_t inode_bytes, sector_bytes;
-    uint8_t ag_log, inop_log, dir_log, v5, ftype, sparse;
+    uint8_t ag_log, inop_log, dir_log, v5, ftype, sparse, rmap;
     uint8_t uuid[16], metadata_uuid[16];
     uint8_t label[12];
 } XfsReader;

@@ -29,7 +29,7 @@ printf 'XFS sample file\n' > source/boot/inline
 objcopy --dump-section .infiltrator_boot=reader.so "$carrier" carrier-copy.so
 if [[ -n "$firmware" ]]; then cmp "$firmware" reader.so; fi
 truncate -s 320M media.img
-mkfs.xfs -q -f -p proto media.img
+mkfs.xfs -q -f -m rmapbt=1 -p proto media.img
 xfs_repair -n -f media.img >/dev/null
 sha256sum media.img > media.sha256
 for module in "$carrier" "$work/reader.so"; do
@@ -60,7 +60,19 @@ def fsb(addr): return (addr>>sb[124])*agblocks+(addr&((1<<sb[124])-1))
 ino=int(sys.argv[1])
 inodeat=fsb(ino>>sb[123])*bs+(ino&((1<<sb[123])-1))*be(104,2)
 log=fsb(be(48,8))*bs
-for name,pos in [('bad-inode',inodeat+100),('bad-tree',2*be(102,2)+312),('dirty-log',log+512+9)]:
+# Locate the actual multi-block reverse map tree using the native AGF,
+# independently of the provider. Refuse a fixture that cannot reproduce
+# the original reverse-map accounting defect.
+with open('media.img','rb') as src:
+    rmap_root=None
+    for ag in range(be(88,4)):
+        src.seek(ag*agblocks*bs+be(102,2))
+        agf=src.read(be(102,2))
+        if int.from_bytes(agf[80:84],'big')>1:
+            rmap_root=(ag*agblocks+int.from_bytes(agf[24:28],'big'))*bs
+            break
+    assert rmap_root is not None
+for name,pos in [('bad-inode',inodeat+100),('bad-tree',2*be(102,2)+312),('dirty-log',log+512+9),('bad-rmap',rmap_root+52)]:
     path=Path(name+'.img')
     subprocess.run(['cp','--sparse=always','--reflink=auto','media.img',path],check=True)
     with path.open('r+b') as f:
@@ -74,6 +86,11 @@ for name in bad-inode bad-tree dirty-log; do
     done
     sha256sum -c "$name.sha256"
 done
+# RMAP allocation inventory is a hosted-only capability; reject the
+# damaged CRC through the same mount-corruption assertion as bad-tree.
+sha256sum bad-rmap.img > bad-rmap.sha256
+"$reader" "$carrier" bad-rmap.img "$work/source" 512 bad-tree
+sha256sum -c bad-rmap.sha256
 sha256sum -c media.sha256
 truncate -s 320M v4.img
 mkfs.xfs -q -f -m crc=0 -p proto v4.img

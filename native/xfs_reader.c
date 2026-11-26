@@ -60,6 +60,7 @@ int xfs_reader_configure(XfsReader *r, const IfsFsHostRuntimeV2 *host, const uin
     uint32_t incompat = r->v5 ? xfs_be32(sb + 216) : 0;
     r->sector_bytes = xfs_be16(sb + 102);
     r->sparse = !!(incompat & 2u);
+    r->rmap = r->v5 && !!(xfs_be32(sb + 212u) & 2u);
     r->ftype = r->v5 ? !!(incompat & 1u) : !!(xfs_be32(sb + 200) & 0x200u);
     memcpy(r->uuid, sb + 32, 16);
     /* sb_fname is exactly 12 bytes, not necessarily NUL terminated. */
@@ -915,6 +916,59 @@ done:
     r->host.release(r->host.context,p);
     return rc;
 }
+/* RMAPBT shares the AGF btree-block counter with BNOBT and CNTBT.
+ * Its internal nodes carry paired low/high keys (40 bytes) and short
+ * 4-byte child pointers. Leaf records are 24 bytes and may overlap
+ * legitimately on reflink volumes, but cannot claim ordinary free space.
+ * Count actual, checksum-validated tree blocks, not a guessed difference
+ * between the recorded free-space and allocation-tree totals. */
+static int reverse_map_tree(AllocationScan *s,uint32_t node,uint32_t depth,
+                            uint32_t *visited)
+{
+    const XfsReader *r=s->r;
+    if(!depth || depth>16u || !node || node>=s->length ||
+       s->state[node])return IFS_FS_CORRUPT;
+    s->state[node]=ALLOC_META;
+    ++*visited;
+    if(r->host.cancelled && r->host.cancelled(r->host.context))return IFS_FS_BUSY;
+    uint8_t *p=r->host.allocate(r->host.context,r->block_bytes);
+    if(!p)return IFS_FS_NO_MEMORY;
+    const uint64_t at=(s->base+node)*r->block_bytes;
+    int rc=ifs_fs_host_read_bytes_v2(&r->host,at,p,r->block_bytes);
+    if(rc)goto done;
+    rc=IFS_FS_CORRUPT;
+    if(xfs_be32(p)!=UINT32_C(0x524d4233) || xfs_be16(p+4)!=depth-1u ||
+       xfs_be64(p+16)!=at/512u || memcmp(p+32,r->metadata_uuid,16u) ||
+       xfs_be32(p+48)!=s->ag ||
+       infiltratr_load_le32(p+52)!=xfs_crc_field(p,r->block_bytes,52u))goto done;
+    const uint32_t n=xfs_be16(p+6),header=56u;
+    const uint32_t max=(r->block_bytes-header)/(depth>1u?44u:24u);
+    if(!n || n>max)goto done;
+    uint32_t previous=0u;
+    for(uint32_t i=0u;i<n;++i) {
+        const uint8_t *rec=p+header+(depth>1u?40u:24u)*i;
+        uint32_t start=xfs_be32(rec);
+        if(start>=s->length || (i && start<previous))goto done;
+        previous=start;
+        if(depth>1u) {
+            uint32_t high=xfs_be32(rec+20u);
+            if(high<start || high>=s->length)goto done;
+            uint32_t child=xfs_be32(p+header+40u*max+4u*i);
+            rc=reverse_map_tree(s,child,depth-1u,visited);
+            if(rc)goto done;
+            rc=IFS_FS_CORRUPT;
+        } else {
+            uint32_t length=xfs_be32(rec+4u);
+            if(!length || length>s->length-start)goto done;
+            for(uint32_t j=0u;j<length;++j)
+                if(s->state[start+j]&(ALLOC_BNO|ALLOC_CNT))goto done;
+        }
+    }
+    rc=IFS_FS_OK;
+done:
+    r->host.release(r->host.context,p);
+    return rc;
+}
 static int allocation_group(AllocationScan *s)
 {
     const XfsReader *r=s->r;
@@ -933,11 +987,12 @@ static int allocation_group(AllocationScan *s)
        xfs_be32(agf+8)!=s->ag || xfs_be32(agf+12)!=s->length)goto done;
     if(r->v5 && (memcmp(agf+64,r->metadata_uuid,16u) ||
        infiltratr_load_le32(agf+216)!=xfs_crc_field(agf,r->sector_bytes,216u)))goto done;
-    const uint32_t shift=r->v5?8u:0u;
-    const uint32_t first=xfs_be32(agf+32u+shift),last=xfs_be32(agf+36u+shift);
-    const uint32_t count=xfs_be32(agf+40u+shift);
-    const uint32_t free_count=xfs_be32(agf+44u+shift),longest=xfs_be32(agf+48u+shift);
-    const uint32_t btree=xfs_be32(agf+52u+shift);
+    /* V4 retained spare slots for the later RMAP root and level.
+     * The following offsets are identical in both disk versions. */
+    const uint32_t first=xfs_be32(agf+40u),last=xfs_be32(agf+44u);
+    const uint32_t count=xfs_be32(agf+48u);
+    const uint32_t free_count=xfs_be32(agf+52u),longest=xfs_be32(agf+56u);
+    const uint32_t btree=xfs_be32(agf+60u);
     const uint32_t fl_header=r->v5?36u:0u;
     const uint32_t fl_cap=(r->sector_bytes-fl_header)/4u;
     if(!fl_cap || count>fl_cap || free_count>s->length || longest>free_count ||
@@ -974,14 +1029,28 @@ static int allocation_group(AllocationScan *s)
        infiltratr_load_le32(fl+312)!=xfs_crc_field(fl,r->sector_bytes,312u)))goto done;
     rc=reserve_blocks(s,xfs_be32(fl+20),1u,ALLOC_META);
     if(rc)goto done;
-    rc=allocation_tree(s,xfs_be32(agf+16),xfs_be32(agf+24u+(r->v5?4u:0u)),ALLOC_BNO);
+    rc=allocation_tree(s,xfs_be32(agf+16),xfs_be32(agf+28u),ALLOC_BNO);
     if(rc)goto done;
     if(s->count!=free_count || s->longest!=longest){rc=IFS_FS_CORRUPT;goto done;}
     s->count=0u;s->longest=0u;s->previous=0;
-    rc=allocation_tree(s,xfs_be32(agf+20),xfs_be32(agf+28u+(r->v5?4u:0u)),ALLOC_CNT);
+    rc=allocation_tree(s,xfs_be32(agf+20),xfs_be32(agf+32u),ALLOC_CNT);
     if(rc)goto done;
-    if(s->count!=free_count || s->longest!=longest || s->tree_nodes<2u ||
-       s->tree_nodes-2u!=btree){rc=IFS_FS_CORRUPT;goto done;}
+    if(s->count!=free_count || s->longest!=longest || s->tree_nodes<2u){
+        rc=IFS_FS_CORRUPT;goto done;
+    }
+    uint32_t rmap_nodes=0u;
+    if(r->rmap) {
+        const uint32_t expected=xfs_be32(agf+80u);
+        if(!expected || expected>s->length){rc=IFS_FS_CORRUPT;goto done;}
+        rc=reverse_map_tree(s,xfs_be32(agf+24u),xfs_be32(agf+36u),&rmap_nodes);
+        if(rc)goto done;
+        if(rmap_nodes!=expected){rc=IFS_FS_CORRUPT;goto done;}
+    }
+    /* Each tree's permanently allocated root is excluded by agf_btreeblks.
+     * The remaining RMAP nodes were previously misdiagnosed as corruption. */
+    if((uint64_t)(s->tree_nodes-2u)+(rmap_nodes?rmap_nodes-1u:0u)!=btree){
+        rc=IFS_FS_CORRUPT;goto done;
+    }
     s->freelist=count;s->tree_reserve=btree;
     for(uint32_t i=0;i<s->length;++i)
         if((s->state[i]&(ALLOC_BNO|ALLOC_CNT))!=0u &&
