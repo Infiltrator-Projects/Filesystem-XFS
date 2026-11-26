@@ -29,8 +29,10 @@ The target installation is `/System/Filesystems/XFS.so` and `/System/Resources/D
 - [Provider implementation](module/xfs_v2_probe.c)
 - [Native design or source provenance](native/filesystems/xfs/DESIGN.md)
 - [Migration and source history](MIGRATION_STATUS.md)
-- [Original-format reference source](docs/XFS.pages) and [PDF](docs/XFS.pdf)
+- [Original-format reference source](docs/XFS.pdfstreams) and [PDF](docs/XFS.pdf)
 - [Project philosophy](docs/PHILOSOPHY.md)
 - [Common ABI](https://github.com/Infiltrator-Projects/Libraries)
 
 The original-format reference and historical migration notes describe different evidence from the current production provider. When descriptions disagree, the current exported descriptor, implementation, executable tests and exact-revision release evidence take precedence.
+
+The [engineering reference](docs/XFS-TECHNICAL-REFERENCE.md) adds field-level original-format guidance. The earlier manual is retained as a historical appendix in the PDF.
