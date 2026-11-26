@@ -34,7 +34,16 @@ xfs_repair -n -f media.img >/dev/null
 sha256sum media.img > media.sha256
 for module in "$carrier" "$work/reader.so"; do
     for sector in 512 4096; do
-        "$reader" "$module" media.img "$work/source" "$sector" clean
+        if ! "$reader" "$module" media.img "$work/source" "$sector" clean; then
+            # Independent allocation-accounting evidence on a real-media
+            # failure; never hide the provider's failed return code.
+            xfs_db -r -c 'sb 0' -c 'p fdblocks agcount blocksize features2' media.img
+            for ag in 0 1 2 3; do
+                xfs_db -r -c "agf $ag" -c 'p' media.img
+                xfs_db -r -c "agfl $ag" -c 'p' media.img
+            done
+            exit 1
+        fi
     done
 done
 # Locate metadata independently using xfs_db and the allocation group layout.
