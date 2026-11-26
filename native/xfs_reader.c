@@ -845,7 +845,7 @@ typedef struct {
     uint64_t base;
     uint32_t ag,length,header_blocks;
     uint64_t count;
-    uint32_t longest,last_start,last_length;
+    uint32_t longest,last_start,last_length,tree_nodes,freelist,tree_reserve;
     int previous;
 } AllocationScan;
 
@@ -864,6 +864,7 @@ static int allocation_tree(AllocationScan *s,uint32_t node,uint32_t depth,unsign
     if(!depth || depth>16u || !node || node>=s->length ||
        s->state[node])return IFS_FS_CORRUPT;
     s->state[node]=ALLOC_META;
+    ++s->tree_nodes;
     if(r->host.cancelled && r->host.cancelled(r->host.context))return IFS_FS_BUSY;
     uint8_t *p=r->host.allocate(r->host.context,r->block_bytes);
     if(!p)return IFS_FS_NO_MEMORY;
@@ -936,9 +937,11 @@ static int allocation_group(AllocationScan *s)
     const uint32_t first=xfs_be32(agf+32u+shift),last=xfs_be32(agf+36u+shift);
     const uint32_t count=xfs_be32(agf+40u+shift);
     const uint32_t free_count=xfs_be32(agf+44u+shift),longest=xfs_be32(agf+48u+shift);
+    const uint32_t btree=xfs_be32(agf+52u+shift);
     const uint32_t fl_header=r->v5?36u:0u;
     const uint32_t fl_cap=(r->sector_bytes-fl_header)/4u;
     if(!fl_cap || count>fl_cap || free_count>s->length || longest>free_count ||
+       btree>s->length ||
        (count && (first>=fl_cap || last>=fl_cap ||
                   (first+count-1u)%fl_cap!=last)))goto done;
     rc=reserve_blocks(s,0u,s->header_blocks,ALLOC_META);
@@ -977,7 +980,9 @@ static int allocation_group(AllocationScan *s)
     s->count=0u;s->longest=0u;s->previous=0;
     rc=allocation_tree(s,xfs_be32(agf+20),xfs_be32(agf+28u+(r->v5?4u:0u)),ALLOC_CNT);
     if(rc)goto done;
-    if(s->count!=free_count || s->longest!=longest){rc=IFS_FS_CORRUPT;goto done;}
+    if(s->count!=free_count || s->longest!=longest || s->tree_nodes<2u ||
+       s->tree_nodes-2u!=btree){rc=IFS_FS_CORRUPT;goto done;}
+    s->freelist=count;s->tree_reserve=btree;
     for(uint32_t i=0;i<s->length;++i)
         if((s->state[i]&(ALLOC_BNO|ALLOC_CNT))!=0u &&
            (s->state[i]&(ALLOC_BNO|ALLOC_CNT))!=(ALLOC_BNO|ALLOC_CNT)) {
@@ -989,6 +994,37 @@ done:
     r->host.release(r->host.context,agf);
     return rc;
 }
+/* The native superblock counts ordinary free extents, AGFL entries and
+ * non-root allocation-tree blocks together. Only the first class is
+ * directly available to an ordinary file. Verify the recorded total
+ * without misrepresenting either internal reserve as a free growth gap.
+ */
+int xfs_reader_allocation_summary(const XfsReader *r,uint64_t recorded_bytes,
+                                  uint64_t *ordinary_bytes)
+{
+    if(!r || !ordinary_bytes || !r->block_bytes ||
+       recorded_bytes%r->block_bytes)return IFS_FS_INVALID;
+    uint64_t ordinary=0u,accounted=0u;
+    for(uint64_t base=0u;base<r->blocks;base+=r->ag_blocks) {
+        AllocationScan s={.r=r,.ag=(uint32_t)(base/r->ag_blocks),.base=base};
+        s.length=(uint32_t)(r->blocks-base<r->ag_blocks?r->blocks-base:r->ag_blocks);
+        s.header_blocks=(4u*r->sector_bytes+r->block_bytes-1u)/r->block_bytes;
+        if(s.length>64u*1024u*1024u)return IFS_FS_NO_MEMORY;
+        s.state=r->host.allocate(r->host.context,s.length);
+        if(!s.state)return IFS_FS_NO_MEMORY;
+        memset(s.state,0,s.length);
+        int rc=allocation_group(&s);
+        r->host.release(r->host.context,s.state);
+        if(rc)return rc;
+        const uint64_t total=s.count+s.freelist+s.tree_reserve;
+        if(total>s.length || accounted>r->blocks-total)return IFS_FS_CORRUPT;
+        accounted+=total;ordinary+=s.count;
+    }
+    if(accounted!=recorded_bytes/r->block_bytes)return IFS_FS_CORRUPT;
+    *ordinary_bytes=ordinary*r->block_bytes;
+    return IFS_FS_OK;
+}
+
 int xfs_reader_allocation(const XfsReader *r,uint64_t first,
                           IfsFsAllocationRangeV2 *out,uint32_t capacity,uint32_t *written)
 {

@@ -192,6 +192,10 @@ static int mount_volume(const IfsFsHostRuntimeV2 *h, void **handle, IfsFsVolumeI
     int rc = inspect(h, &variant, &measured, reader);
     if (!rc)
         rc = xfs_reader_check_root(reader);
+#ifndef IFS_XFS_FIRMWARE
+    if (!rc)
+        rc = xfs_reader_allocation_summary(reader,measured.free_bytes,&measured.free_bytes);
+#endif
     if (rc) {
         h->release(h->context, reader);
         return rc;

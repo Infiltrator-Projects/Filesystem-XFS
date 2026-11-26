@@ -70,7 +70,7 @@ int main(int argc,char **argv)
     CHECK(core->probe(&ro,&detected)==IFS_FS_OK && detected==variant);
     CHECK(core->mount(&ro,&mount,&info)==IFS_FS_OK && mount);
     CHECK(info.variant==variant && info.total_bytes==m.bytes &&
-          info.free_bytes==m.bytes-(16384u+24u)*4096u);
+          info.free_bytes==m.bytes-(16384u+40u)*4096u);
     char label[13],tiny[2]={'X','X'};
     uint32_t label_bytes=0;
     CHECK(vol->label && !vol->set_label &&
@@ -97,7 +97,7 @@ int main(int argc,char **argv)
     /* Four AGFL blocks in each of the four formatter-owned AGs count
      * in sb_fdblocks but must not be advertised as ordinary free space. */
     CHECK(at==m.bytes && !unknown && reserved==16u*4096u &&
-          free_bytes+reserved==info.free_bytes && used+reserved+free_bytes==m.bytes);
+          free_bytes==info.free_bytes && used+reserved+free_bytes==m.bytes);
     CHECK(core->stat(mount,"/",&entry)==IFS_FS_OK && entry.type==IFS_FS_ENTRY_DIRECTORY);
     CHECK(core->directory_entry(mount,"/",0u,&entry)==IFS_FS_END);
     CHECK(vol->format(&h,variant,"NativeXFS",0u)==IFS_FS_BUSY);
