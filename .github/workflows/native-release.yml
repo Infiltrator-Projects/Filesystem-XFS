@@ -49,7 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           git clone --quiet https://github.com/Infiltrator-Projects/Libraries "$RUNNER_TEMP/common-xfs"
-          git -C "$RUNNER_TEMP/common-xfs" checkout --quiet d23a52693fd3212368d327e1c1302e07ae9510ec
+          git -C "$RUNNER_TEMP/common-xfs" checkout --quiet 965e5d191a6f7d078f5d07218dbaabfb00fa1a20
           cc -std=c11 -O2 -Wall -Wextra -Wpedantic -Werror -I"$RUNNER_TEMP/common-xfs/include" tests/test_format.c -ldl -o "$RUNNER_TEMP/format-xfs"
           for profile in portable native-root; do
             sh tests/format_media.sh "$RUNNER_TEMP/format-xfs" "$RUNNER_TEMP/$profile/System/Filesystems/XFS.so" "$(command -v xfs_repair)"
