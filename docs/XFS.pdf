@@ -44,25 +44,25 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 9 0 R >>
 endobj
 9 0 obj
-<< /Length 1940 >>
+<< /Length 1907 >>
 stream
 0.06 0.15 0.23 rg 0 768 595 74 re f
 1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
 BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
 0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (1. History and version boundary) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (XFS originated at Silicon Graphics for IRIX in the 1990s and entered Linux mainline) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (in the 2.6 era. It uses independently managed allocation groups, extent mappings,) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (B-trees, dynamic inode allocation and a metadata transaction log. This reference is) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (pinned to Linux v6.12's libxfs definitions, distinguishing legacy v4 superblocks) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (from v5 CRC-enabled metadata. A v5 volume may additionally use reverse mappings,) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (shared extents, sparse inode chunks, bigtime and other features. Those flags must) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (be admitted individually. XFS is not a bitmap-based ext2-style allocator; a block's) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (group-relative address, encoded filesystem-block number and physical linear block) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (number are distinct.) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 570 Td (XFS was designed for IRIX workstation/server streaming and parallel large-file) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 556 Td (workloads. The Linux port followed in the early 2000s; allocation groups improve) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 542 Td (parallelism but add independent metadata and geometry requirements. Ordinary file) Tj ET
-0.08 0.14 0.20 rg BT /F3 10 Tf 43 528 Td (payload has no native checksum.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (XFS originated at Silicon Graphics for IRIX workstation/server streaming and) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (parallel large-file workloads in the 1990s. The Linux port followed in the) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (early 2000s and entered mainline in the 2.6 era. It uses independently managed) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (allocation groups, extent mappings, B-trees, dynamic inode allocation and a) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (metadata transaction log. This reference is pinned to Linux v6.12's libxfs) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (definitions, distinguishing legacy v4 superblocks from v5 CRC-enabled metadata.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (A v5 volume may additionally use reverse mappings, shared extents, sparse inode) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (chunks, bigtime and other features. Those flags must be admitted individually.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (XFS is not a bitmap-based ext2-style allocator; a block's group-relative) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 580 Td (address, encoded filesystem-block number and physical linear block number are) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 566 Td (distinct.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 542 Td (Allocation groups improve parallelism but add independent metadata and geometry) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 528 Td (requirements. Ordinary file payload has no native checksum.) Tj ET
 0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 2) Tj ET
 endstream
 endobj
@@ -358,32 +358,32 @@ xref
 0000000565 00000 n 
 0000002084 00000 n 
 0000002230 00000 n 
-0000004221 00000 n 
-0000004369 00000 n 
-0000006004 00000 n 
-0000006152 00000 n 
-0000007816 00000 n 
-0000007964 00000 n 
-0000009495 00000 n 
-0000009643 00000 n 
-0000011320 00000 n 
-0000011468 00000 n 
-0000012989 00000 n 
-0000013137 00000 n 
-0000014687 00000 n 
-0000014835 00000 n 
-0000016370 00000 n 
-0000016518 00000 n 
-0000018194 00000 n 
-0000018342 00000 n 
-0000020047 00000 n 
-0000020195 00000 n 
-0000021760 00000 n 
-0000021908 00000 n 
-0000024341 00000 n 
-0000024489 00000 n 
+0000004188 00000 n 
+0000004336 00000 n 
+0000005971 00000 n 
+0000006119 00000 n 
+0000007783 00000 n 
+0000007931 00000 n 
+0000009462 00000 n 
+0000009610 00000 n 
+0000011287 00000 n 
+0000011435 00000 n 
+0000012956 00000 n 
+0000013104 00000 n 
+0000014654 00000 n 
+0000014802 00000 n 
+0000016337 00000 n 
+0000016485 00000 n 
+0000018161 00000 n 
+0000018309 00000 n 
+0000020014 00000 n 
+0000020162 00000 n 
+0000021727 00000 n 
+0000021875 00000 n 
+0000024308 00000 n 
+0000024456 00000 n 
 trailer
 << /Size 34 /Root 1 0 R >>
 startxref
-26460
+26427
 %%EOF

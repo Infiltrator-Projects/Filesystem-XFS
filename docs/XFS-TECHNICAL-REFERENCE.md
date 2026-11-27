@@ -2,9 +2,9 @@
 
 ## History and version boundary
 
-XFS originated at Silicon Graphics for IRIX in the 1990s and entered Linux mainline in the 2.6 era. It uses independently managed allocation groups, extent mappings, B-trees, dynamic inode allocation and a metadata transaction log. This reference is pinned to Linux v6.12's libxfs definitions, distinguishing legacy v4 superblocks from v5 CRC-enabled metadata. A v5 volume may additionally use reverse mappings, shared extents, sparse inode chunks, bigtime and other features. Those flags must be admitted individually. XFS is not a bitmap-based ext2-style allocator; a block's group-relative address, encoded filesystem-block number and physical linear block number are distinct.
+XFS originated at Silicon Graphics for IRIX workstation/server streaming and parallel large-file workloads in the 1990s. The Linux port followed in the early 2000s and entered mainline in the 2.6 era. It uses independently managed allocation groups, extent mappings, B-trees, dynamic inode allocation and a metadata transaction log. This reference is pinned to Linux v6.12's libxfs definitions, distinguishing legacy v4 superblocks from v5 CRC-enabled metadata. A v5 volume may additionally use reverse mappings, shared extents, sparse inode chunks, bigtime and other features. Those flags must be admitted individually. XFS is not a bitmap-based ext2-style allocator; a block's group-relative address, encoded filesystem-block number and physical linear block number are distinct.
 
-XFS was designed for IRIX workstation/server streaming and parallel large-file workloads. The Linux port followed in the early 2000s; allocation groups improve parallelism but add independent metadata and geometry requirements. Ordinary file payload has no native checksum.
+Allocation groups improve parallelism but add independent metadata and geometry requirements. Ordinary file payload has no native checksum.
 
 ## Superblock fields and geometry
 
