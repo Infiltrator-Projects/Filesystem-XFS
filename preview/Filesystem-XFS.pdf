@@ -3,7 +3,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R 30 0 R 32 0 R 34 0 R 36 0 R 38 0 R 40 0 R 42 0 R 44 0 R 46 0 R 48 0 R 50 0 R 52 0 R 54 0 R 56 0 R 58 0 R 60 0 R] /Count 28 >>
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R 30 0 R 32 0 R] /Count 14 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
@@ -18,849 +18,372 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 7 0 R >>
 endobj
 7 0 obj
-<< /Length 1199 >>
+<< /Length 1468 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (History and version boundary) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(XFS originated at Silicon Graphics for IRIX in the 1990s and entered Linux) Tj
-T* (mainline in the 2.6 era. It uses independently managed allocation groups,) Tj
-T* (extent mappings, B-trees, dynamic inode allocation and a metadata) Tj
-T* (transaction log. This reference is pinned to Linux v6.12's libxfs) Tj
-T* (definitions, distinguishing legacy v4 superblocks from v5 CRC-enabled) Tj
-T* (metadata. A v5 volume may additionally use reverse mappings, shared extents,) Tj
-T* (sparse inode chunks, bigtime and other features. Those flags must be) Tj
-T* (admitted individually. XFS is not a bitmap-based ext2-style allocator; a) Tj
-T* (block's group-relative address, encoded filesystem-block number and physical) Tj
-T* (linear block number are distinct.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 1 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 18 Tf 43 736 Td (Contents) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 711 Td (1. History and version boundary) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 695 Td (2. Superblock fields and geometry) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 679 Td (3. Superblock statistics and v5 features) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 663 Td (4. Encoded block and inode addressing) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 647 Td (5. Allocation group headers and free space) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 631 Td (6. Inode allocation and orphan state) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 615 Td (7. Dinode core and forks) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 599 Td (8. Packed extent records and example) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 583 Td (9. B-tree nodes and inode-root geometry) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 567 Td (10. Directory and extended-attribute formats) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 551 Td (11. Reverse maps, reflink and allocation ownership) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 535 Td (12. Implementation and qualification boundary) Tj ET
+0.08 0.14 0.20 rg BT /F1 11 Tf 43 519 Td (13. Journal, recovery and validation) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 1) Tj ET
 endstream
 endobj
 8 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 9 0 R >>
 endobj
 9 0 obj
-<< /Length 1263 >>
+<< /Length 1940 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Superblock fields and geometry) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(Ordinary superblock integers are big-endian. The first superblock begins at) Tj
-T* (volume byte zero; each allocation group begins with another superblock.) Tj
-T* (Magic XFSB \(0x58465342\) at 0, block bytes 4, 64-bit data/realtime block and) Tj
-T* (realtime extent counts 8/16/24, UUID 32, internal log start 48, root inode) Tj
-T* (56, realtime bitmap/summary inode 64/72. Realtime extent size 80, blocks per) Tj
-T* (AG 84, AG count 88, realtime bitmap blocks 92, log blocks 96; 16-bit) Tj
-T* (version, sector size, inode size and inodes per block at 100/102/104/106.) Tj
-T* (Label 108..119; block, sector, inode, inodes-per-block and AG-block exponent) Tj
-T* (bytes 120..124. Validate actual AG count, shorter last AG, power-of-two) Tj
-T* (geometry, feature flags and in-progress marker before using any address.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 2 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (1. History and version boundary) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (XFS originated at Silicon Graphics for IRIX in the 1990s and entered Linux mainline) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (in the 2.6 era. It uses independently managed allocation groups, extent mappings,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (B-trees, dynamic inode allocation and a metadata transaction log. This reference is) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (pinned to Linux v6.12's libxfs definitions, distinguishing legacy v4 superblocks) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (from v5 CRC-enabled metadata. A v5 volume may additionally use reverse mappings,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (shared extents, sparse inode chunks, bigtime and other features. Those flags must) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (be admitted individually. XFS is not a bitmap-based ext2-style allocator; a block's) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (group-relative address, encoded filesystem-block number and physical linear block) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (number are distinct.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 570 Td (XFS was designed for IRIX workstation/server streaming and parallel large-file) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 556 Td (workloads. The Linux port followed in the early 2000s; allocation groups improve) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 542 Td (parallelism but add independent metadata and geometry requirements. Ordinary file) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 528 Td (payload has no native checksum.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 2) Tj ET
 endstream
 endobj
 10 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R >>
 endobj
 11 0 obj
-<< /Length 1300 >>
+<< /Length 1583 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Superblock statistics and v5 features) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(64-bit allocated inode count, free inode count, free data blocks and free) Tj
-T* (realtime extents at 128/136/144/152; user and group quota inode numbers) Tj
-T* (160/168. Quota flags at 176, inode alignment 180, stripe unit and width) Tj
-T* (184/188, directory block exponent 192, log sector exponent 193, log sector) Tj
-T* (bytes 194 and log stripe unit 196. Features2 at 200 and historical duplicate) Tj
-T* (at 204; v5 compatible, RO-compatible, incompatible and log-incompatible) Tj
-T* (masks at 208/212/216/220. Little-endian CRC at 224, sparse inode alignment) Tj
-T* (228, project quota inode 232, LSN 240, metadata UUID 248. The ordinary v5) Tj
-T* (CRC is CRC32C with the format-specific field and coverage rules; do not) Tj
-T* (confuse its byte order with surrounding fields. Unknown log-incompatible) Tj
-T* (bits prohibit safe recovery.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 3 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (2. Superblock fields and geometry) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (Ordinary superblock integers are big-endian. The first superblock begins at volume) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (byte zero; each allocation group begins with another superblock. Magic XFSB) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (\(0x58465342\) at 0, block bytes 4, 64-bit data/realtime block and realtime extent) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (counts 8/16/24, UUID 32, internal log start 48, root inode 56, realtime) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (bitmap/summary inode 64/72. Realtime extent size 80, blocks per AG 84, AG count 88,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (realtime bitmap blocks 92, log blocks 96; 16-bit version, sector size, inode size) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (and inodes per block at 100/102/104/106. Label 108..119; block, sector, inode,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (inodes-per-block and AG-block exponent bytes 120..124. Validate actual AG count,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (shorter last AG, power-of-two geometry, feature flags and in-progress marker before) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 580 Td (using any address.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 3) Tj ET
 endstream
 endobj
 12 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 13 0 R >>
 endobj
 13 0 obj
-<< /Length 1208 >>
+<< /Length 1612 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Encoded block and inode addressing) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(Let A=AG-block exponent, G=blocks per group and B=block bytes. An encoded) Tj
-T* (fsblock x has AG number x>>A and relative block x & \(2^A-1\). Its linear) Tj
-T* (physical block is AG*G+relative, not necessarily x. For G=100000, A=17, AG 2) Tj
-T* (relative block 300, encoded value is 262444, but physical block is 200300.) Tj
-T* (An inode number packs the AG number above A+inopblog low bits. Decode the) Tj
-T* (low bits into AG-relative block and in-block inode index; inode byte address) Tj
-T* (equals \(AG*G+agbno\)*B+index*inode_size. Verify group boundaries and that the) Tj
-T* (inode chunk actually exists in the inode allocation tree. Never accept an) Tj
-T* (arbitrary encoded inode simply because its computed byte offset fits the) Tj
-T* (image.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 4 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (3. Superblock statistics and v5 features) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (64-bit allocated inode count, free inode count, free data blocks and free realtime) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (extents at 128/136/144/152; user and group quota inode numbers 160/168. Quota flags) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (at 176, inode alignment 180, stripe unit and width 184/188, directory block) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (exponent 192, log sector exponent 193, log sector bytes 194 and log stripe unit) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (196. Features2 at 200 and historical duplicate at 204; v5 compatible,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (RO-compatible, incompatible and log-incompatible masks at 208/212/216/220.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (Little-endian CRC at 224, sparse inode alignment 228, project quota inode 232, LSN) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (240, metadata UUID 248. The ordinary v5 CRC is CRC32C with the format-specific) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (field and coverage rules; do not confuse its byte order with surrounding fields.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 580 Td (Unknown log-incompatible bits prohibit safe recovery.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 4) Tj ET
 endstream
 endobj
 14 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 15 0 R >>
 endobj
 15 0 obj
-<< /Length 1313 >>
+<< /Length 1479 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Allocation group headers and free space) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(At each AG start, the superblock is followed by AGF, AGI and AGFL at) Tj
-T* (sector-relative offsets one, two and three, not necessarily separate) Tj
-T* (filesystem blocks. AGF magic XAGF, version, group number, length at) Tj
-T* (0/4/8/12; block-number, count and reverse-mapping roots at 16/20/24, levels) Tj
-T* (28/32/36; free-list first/last/count 40/44/48, free blocks 52, longest run) Tj
-T* (56, allocation-tree blocks 60; UUID 64. V5 refcount root/level at 88/92.) Tj
-T* (Free extent records contain big-endian startblock and blockcount. The) Tj
-T* (block-number tree orders by start; the count tree orders by length and) Tj
-T* (start. Both describe the same free ranges. AGFL is a reserve for) Tj
-T* (allocation-tree blocks, not ordinary file free space. Check duplicate,) Tj
-T* (overlapping and out-of-group extents and cross-reconcile both trees.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 5 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (4. Encoded block and inode addressing) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (Let A=AG-block exponent, G=blocks per group and B=block bytes. An encoded fsblock x) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (has AG number x>>A and relative block x & \(2^A-1\). Its linear physical block is) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (AG*G+relative, not necessarily x. For G=100000, A=17, AG 2 relative block 300,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (encoded value is 262444, but physical block is 200300. An inode number packs the AG) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (number above A+inopblog low bits. Decode the low bits into AG-relative block and) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (in-block inode index; inode byte address equals \(AG*G+agbno\)*B+index*inode_size.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (Verify group boundaries and that the inode chunk actually exists in the inode) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (allocation tree. Never accept an arbitrary encoded inode simply because its) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (computed byte offset fits the image.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 5) Tj ET
 endstream
 endobj
 16 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 17 0 R >>
 endobj
 17 0 obj
-<< /Length 1198 >>
+<< /Length 1625 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Inode allocation and orphan state) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(AGI magic XAGI, version, group number, length at 0/4/8/12, allocated inode) Tj
-T* (count 16, inode-tree root 20, level 24, free count 28, recent inode/dir) Tj
-T* (hints 32/36. Its 64 unlinked-inode buckets begin at 40. The v5 UUID is at) Tj
-T* (296, CRC 312 and LSN 320, free inode tree root/level 328/332. The inode) Tj
-T* (allocation tree uses chunks of 64 inode identities, with a 64-bit free mask;) Tj
-T* (sparse chunks can have a hole mask and counts replacing the legacy) Tj
-T* (full-chunk fields. A set free bit does not establish that a sparse missing) Tj
-T* (inode slot has a physical record. Cross-check the optional free-inode tree) Tj
-T* (and never reclaim an unlinked but still referenced inode without native) Tj
-T* (recovery rules.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 6 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (5. Allocation group headers and free space) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (At each AG start, the superblock is followed by AGF, AGI and AGFL at) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (sector-relative offsets one, two and three, not necessarily separate filesystem) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (blocks. AGF magic XAGF, version, group number, length at 0/4/8/12; block-number,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (count and reverse-mapping roots at 16/20/24, levels 28/32/36; free-list) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (first/last/count 40/44/48, free blocks 52, longest run 56, allocation-tree blocks) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (60; UUID 64. V5 refcount root/level at 88/92. Free extent records contain) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (big-endian startblock and blockcount. The block-number tree orders by start; the) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (count tree orders by length and start. Both describe the same free ranges. AGFL is) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (a reserve for allocation-tree blocks, not ordinary file free space. Check) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 580 Td (duplicate, overlapping and out-of-group extents and cross-reconcile both trees.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 6) Tj ET
 endstream
 endobj
 18 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 19 0 R >>
 endobj
 19 0 obj
-<< /Length 1227 >>
+<< /Length 1469 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Dinode core and forks) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(Inode magic IN at 0, mode 2, version 4, data format 5, legacy links 6,) Tj
-T* (UID/GID 8/12, link count 16, project ID halves 20/22. Atime/mtime/ctime at) Tj
-T* (32/40/48, size 56, allocated blocks 64, extent-size hint 72, ordinary) Tj
-T* (data/attr extent counts 76/80, attr-fork offset byte 82 and attr format 83,) Tj
-T* (flags 90, generation 92, next unlinked 96. Legacy core size is 100; v3 adds) Tj
-T* (CRC at 100, change count 104, LSN 112, flags2 120, CoW hint 128, creation) Tj
-T* (time 144, self inode 152 and UUID 160, ending at 176. Large extent counts) Tj
-T* (and bigtime alter specific fields under flags. Fork offset is measured in) Tj
-T* (eight-byte units from the literal area. Local, extent, B-tree and device) Tj
-T* (formats are distinct; validate fork bounds and type.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 7 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (6. Inode allocation and orphan state) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (AGI magic XAGI, version, group number, length at 0/4/8/12, allocated inode count) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (16, inode-tree root 20, level 24, free count 28, recent inode/dir hints 32/36. Its) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (64 unlinked-inode buckets begin at 40. The v5 UUID is at 296, CRC 312 and LSN 320,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (free inode tree root/level 328/332. The inode allocation tree uses chunks of 64) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (inode identities, with a 64-bit free mask; sparse chunks can have a hole mask and) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (counts replacing the legacy full-chunk fields. A set free bit does not establish) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (that a sparse missing inode slot has a physical record. Cross-check the optional) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (free-inode tree and never reclaim an unlinked but still referenced inode without) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (native recovery rules.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 7) Tj ET
 endstream
 endobj
 20 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 21 0 R >>
 endobj
 21 0 obj
-<< /Length 1212 >>
+<< /Length 1498 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Packed extent records and example) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(Each extent mapping is two big-endian 64-bit words w0 and w1. Unwritten flag) Tj
-T* (is w0 bit 63; logical startoff=\(w0>>9\)&\(\(1<<54\)-1\). Physical) Tj
-T* (startblock=\(\(w0&0x1ff\)<<43\)|\(w1>>21\), length=w1&\(\(1<<21\)-1\). Startoff and) Tj
-T* (length use filesystem blocks. Example: logical run starts at block 200,) Tj
-T* (length 12, physical start encoded for AG 2 relative block 300; logical block) Tj
-T* (205 maps to AG 2 relative 305. Translate to physical linear block with the) Tj
-T* (actual AG size, then add in-block offset. Unwritten extents are allocated) Tj
-T* (but read as zero, and absent mappings are holes. Validate ordering, extent) Tj
-T* (length, AG crossing restrictions and EOF; realtime data uses a separate) Tj
-T* (address domain.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 8 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (7. Dinode core and forks) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (Inode magic IN at 0, mode 2, version 4, data format 5, legacy links 6, UID/GID) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (8/12, link count 16, project ID halves 20/22. Atime/mtime/ctime at 32/40/48, size) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (56, allocated blocks 64, extent-size hint 72, ordinary data/attr extent counts) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (76/80, attr-fork offset byte 82 and attr format 83, flags 90, generation 92, next) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (unlinked 96. Legacy core size is 100; v3 adds CRC at 100, change count 104, LSN) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (112, flags2 120, CoW hint 128, creation time 144, self inode 152 and UUID 160,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (ending at 176. Large extent counts and bigtime alter specific fields under flags.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (Fork offset is measured in eight-byte units from the literal area. Local, extent,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (B-tree and device formats are distinct; validate fork bounds and type.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 8) Tj ET
 endstream
 endobj
 22 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 23 0 R >>
 endobj
 23 0 obj
-<< /Length 1311 >>
+<< /Length 1483 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (B-tree nodes and inode-root geometry) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(All ordinary B-tree blocks start with magic at 0, level 4 \(16 bits\) and) Tj
-T* (record count 6. Legacy short-pointer headers are 16 bytes, long-pointer) Tj
-T* (headers 24; CRC-enabled headers are 56 and 72 respectively, incorporating) Tj
-T* (physical identity, owner, LSN, UUID and checksum. Short pointers are) Tj
-T* (AG-relative; long mapping pointers are encoded fsblocks. Leaf records and) Tj
-T* (internal key/pointer arrays have different geometry; pointer-array position) Tj
-T* (depends on maximum records rather than used count. The data-fork B-tree root) Tj
-T* (is a compact in-inode structure with level and count followed by keys and) Tj
-T* (pointers. Verify exact magic and revision, node bounds, monotone keys,) Tj
-T* (parent ranges, level transitions and cycles. Do not use sizeof the combined) Tj
-T* (in-memory header as a disk-header size.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 9 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (8. Packed extent records and example) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (Each extent mapping is two big-endian 64-bit words w0 and w1. Unwritten flag is w0) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (bit 63; logical startoff=\(w0>>9\)&\(\(1<<54\)-1\). Physical) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (startblock=\(\(w0&0x1ff\)<<43\)|\(w1>>21\), length=w1&\(\(1<<21\)-1\). Startoff and length) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (use filesystem blocks. Example: logical run starts at block 200, length 12,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (physical start encoded for AG 2 relative block 300; logical block 205 maps to AG 2) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (relative 305. Translate to physical linear block with the actual AG size, then add) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (in-block offset. Unwritten extents are allocated but read as zero, and absent) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (mappings are holes. Validate ordering, extent length, AG crossing restrictions and) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (EOF; realtime data uses a separate address domain.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 9) Tj ET
 endstream
 endobj
 24 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 25 0 R >>
 endobj
 25 0 obj
-<< /Length 1348 >>
+<< /Length 1624 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Directory and extended-attribute formats) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(Small directories may store shortform data directly in the inode, with) Tj
-T* (compact parent and inode numbers selected by the shortform header. Larger) Tj
-T* (directories use block, leaf and node forms. Dir2 data headers occupy 16) Tj
-T* (bytes; dir3 adds CRC, block identity, LSN, UUID and owner for a 64-byte data) Tj
-T* (header. A live data entry contains 64-bit inode, name length byte, name) Tj
-T* (bytes, optional filetype and trailing 16-bit offset tag, aligned to eight) Tj
-T* (bytes. A free record starts with 0xffff and a length and has its own) Tj
-T* (trailing offset tag. Validate tags and bounds, and use the native hashed) Tj
-T* (leaf entries to locate candidates rather than treating hashes as unique) Tj
-T* (names. Extended attributes have local and remote representations and) Tj
-T* (separate fork metadata; preserve names, values, ACLs and security) Tj
-T* (namespaces.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 10 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (9. B-tree nodes and inode-root geometry) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (All ordinary B-tree blocks start with magic at 0, level 4 \(16 bits\) and record) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (count 6. Legacy short-pointer headers are 16 bytes, long-pointer headers 24;) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (CRC-enabled headers are 56 and 72 respectively, incorporating physical identity,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (owner, LSN, UUID and checksum. Short pointers are AG-relative; long mapping) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (pointers are encoded fsblocks. Leaf records and internal key/pointer arrays have) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (different geometry; pointer-array position depends on maximum records rather than) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (used count. The data-fork B-tree root is a compact in-inode structure with level) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (and count followed by keys and pointers. Verify exact magic and revision, node) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (bounds, monotone keys, parent ranges, level transitions and cycles. Do not use) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 580 Td (sizeof the combined in-memory header as a disk-header size.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 10) Tj ET
 endstream
 endobj
 26 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 27 0 R >>
 endobj
 27 0 obj
-<< /Length 1241 >>
+<< /Length 1653 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Reverse maps, reflink and allocation ownership) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(V5 reverse mapping can associate physical extents with owner inode or) Tj
-T* (metadata identity and logical offset; reference-count trees describe shared) Tj
-T* (extents. A duplicate physical reference is not necessarily corruption when) Tj
-T* (reflink is admitted. The forward mapping, reverse mapping and reference) Tj
-T* (counts must agree before relocation or reclamation. Delayed allocation is a) Tj
-T* (runtime reservation and must not be fabricated as a persistent physical run.) Tj
-T* (Realtime volumes require their own bitmap/summary and device identity. A) Tj
-T* (defrag plan must preserve extent state, sharing, data and attr fork) Tj
-T* (mappings, allocation-group counters, and journal ordering; a simple) Tj
-T* (free-space scan cannot establish safe ownership.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 11 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (10. Directory and extended-attribute formats) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (Small directories may store shortform data directly in the inode, with compact) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (parent and inode numbers selected by the shortform header. Larger directories use) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (block, leaf and node forms. Dir2 data headers occupy 16 bytes; dir3 adds CRC, block) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (identity, LSN, UUID and owner for a 64-byte data header. A live data entry contains) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (64-bit inode, name length byte, name bytes, optional filetype and trailing 16-bit) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (offset tag, aligned to eight bytes. A free record starts with 0xffff and a length) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (and has its own trailing offset tag. Validate tags and bounds, and use the native) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (hashed leaf entries to locate candidates rather than treating hashes as unique) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (names. Extended attributes have local and remote representations and separate fork) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 580 Td (metadata; preserve names, values, ACLs and security namespaces.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 11) Tj ET
 endstream
 endobj
 28 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 29 0 R >>
 endobj
 29 0 obj
-<< /Length 1587 >>
+<< /Length 1513 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Journal, recovery and validation) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(The internal or external XFS log stores metadata transactions and) Tj
-T* (intent/completion items. Recovery must establish log head/tail, cycle and) Tj
-T* (record sequence, validate committed items, and apply native buffer/inode) Tj
-T* (replay and deferred operations before trusting a dirty namespace. CRC checks) Tj
-T* (alone do not establish transaction consistency. A writer must reserve space) Tj
-T* (and log capacity, copy verified data and publish changed mappings and) Tj
-T* (allocator metadata under native transaction rules; do not retire blocks) Tj
-T* (until recovery can safely establish ownership. Exact log record and item) Tj
-T* (layouts require further dedicated source and crash-fixture validation.) Tj
-T* (Sources: https://github.com/torvalds/linux/tree/v6.12/fs/xfs) Tj
-T* (\(libxfs/xfs_format.h, xfs_da_format.h, xfs_bmap_btree.c, xfs_bmap.c and log) Tj
-T* (recovery sources\). Test independent xfsprogs images with v4/v5, sparse) Tj
-T* (chunks, non-power-of-two AG size, forks, unwritten extents, reflinks,) Tj
-T* (multiple devices and interrupted relocation. Earlier manual follows as) Tj
-T* (historical evidence.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 12 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (11. Reverse maps, reflink and allocation ownership) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (V5 reverse mapping can associate physical extents with owner inode or metadata) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (identity and logical offset; reference-count trees describe shared extents. A) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (duplicate physical reference is not necessarily corruption when reflink is) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (admitted. The forward mapping, reverse mapping and reference counts must agree) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (before relocation or reclamation. Delayed allocation is a runtime reservation and) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (must not be fabricated as a persistent physical run. Realtime volumes require their) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (own bitmap/summary and device identity. A defrag plan must preserve extent state,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (sharing, data and attr fork mappings, allocation-group counters, and journal) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (ordering; a simple free-space scan cannot establish safe ownership.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 12) Tj ET
 endstream
 endobj
 30 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 31 0 R >>
 endobj
 31 0 obj
-<< /Length 659 >>
+<< /Length 2381 >>
 stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-1 1 1 rg BT /F2 11 Tf 50 807 Td (INFILTRATOR / FILESYSTEM ENGINEERING REFERENCE) Tj ET
-BT /F2 21 Tf 50 775 Td (XFS - technical reference) Tj ET
-0.05 0.13 0.22 rg BT /F2 16 Tf 50 715 Td (Historical reference appendix) Tj ET
-BT /F1 11 Tf 15 TL 50 685 Td
-(The earlier manual follows for provenance. Its implementation status and) Tj
-T* (qualification statements are historical; the new engineering chapters take) Tj
-T* (precedence for original-format interpretation.) Tj
-ET
-0.05 0.13 0.22 rg BT /F1 9 Tf 50 42 Td (Engineering chapter 13 | Original format, not provider qualification) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (12. Implementation and qualification boundary) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (At historical revision f91c0ee203d8 the hosted and embedded reader validated v4/v5) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (geometry, internal log state, inode allocation trees, shortform/data directories) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (and direct/bmap mappings; hosted FORMAT was separate. Tests covered 4Kn and) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (contradictory geometry with recomputed metadata CRC. External logs, realtime) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (volumes, ASCII-insensitive lookup, symlink traversal and journal replay were) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (outside that baseline reader scope.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 612 Td (Common V2 is the independent provider interface:) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 598 Td (https://github.com/Infiltrator-Projects/Libraries/blob/main/docs/FILESYSTEM_COMMON_) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 584 Td (ABI_V2.md . Negotiate real operation masks and media profiles. Use bounded host) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 570 Td (I/O, exclusive unmounted ownership and durable flush for mutation; distinguish) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 556 Td (unsupported, corrupt, I/O and stale-handle results. Test Media and Defragmenter use) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 542 Td (the same engine. Hosted, freestanding, BOOT, kernel, recovery and package) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 528 Td (qualification are independent. Current capability and release status belongs to the) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 514 Td (repository README and exact-source qualification records; historical evidence is) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 500 Td (not a current status claim.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 476 Td (Historical source or test reference:) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 462 Td (https://github.com/Infiltrator-Projects/Filesystem-XFS/tree/f91c0ee203d8 .) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 13) Tj ET
 endstream
 endobj
 32 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 33 0 R >>
 endobj
 33 0 obj
-<< /Length 2728 >>
+<< /Length 1919 >>
 stream
-0.06 0.13 0.22 rg 0 750 595 92 re f
-0.03 0.53 0.58 rg 50 747 120 4 re f
-0.7 0.8 0.85 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.60 0.85 0.90 rg 1 0 0 1 50 803.0 Tm (INFILTRATOR / ORIGINAL FILESYSTEM TECHNICAL REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 774.0 Tm (XFS - SGI high-performance filesystem) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (Filesystem-XFS | Format history, physical design and references) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 509 34.0 Tm (PAGE 01) Tj ET
-BT /F2 12 Tf 0.02 0.50 0.56 rg 1 0 0 1 50 690.0 Tm (HISTORY / ORIGINAL DESIGN / DISK FORMAT) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 655.0 Tm (A journalling, extent-based, allocation-group-oriented filesystem developed for IRIX and) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 638.0 Tm (later integrated into Linux.) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 609.0 Tm (This is a technical reference to the upstream filesystem's historical design, not an) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 592.0 Tm (installer manual. The format's on-media semantics are distinct from the independent) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 575.0 Tm (InfiltratorOS module, its APIs and any Linux kernel adapter.) Tj ET
-BT /F2 12 Tf 0.02 0.50 0.56 rg 1 0 0 1 50 546.0 Tm (CONCEPTUAL MEDIA MAP) Tj ET
-0.040 0.360 0.470 rg 50 463 239 67 re f
-BT /F2 11 Tf 1 1 1 rg 1 0 0 1 61 495.0 Tm (SUPERBLOCK) Tj ET
-BT /F1 8.5 Tf 0.86 0.96 0.97 rg 1 0 0 1 61 476.0 Tm (Primary plus AG metadata) Tj ET
-0.065 0.395 0.495 rg 301 463 239 67 re f
-BT /F2 11 Tf 1 1 1 rg 1 0 0 1 312 495.0 Tm (ALLOCATION GROUPS) Tj ET
-BT /F1 8.5 Tf 0.86 0.96 0.97 rg 1 0 0 1 312 476.0 Tm (Parallelised space management) Tj ET
-0.090 0.430 0.520 rg 50 381 239 67 re f
-BT /F2 11 Tf 1 1 1 rg 1 0 0 1 61 413.0 Tm (B+TREES) Tj ET
-BT /F1 8.5 Tf 0.86 0.96 0.97 rg 1 0 0 1 61 394.0 Tm (Extents, free space, directories) Tj ET
-0.115 0.465 0.545 rg 301 381 239 67 re f
-BT /F2 11 Tf 1 1 1 rg 1 0 0 1 312 413.0 Tm (JOURNAL) Tj ET
-BT /F1 8.5 Tf 0.86 0.96 0.97 rg 1 0 0 1 312 394.0 Tm (Metadata transaction recovery) Tj ET
-BT /F2 12 Tf 0.02 0.50 0.56 rg 1 0 0 1 50 340.0 Tm (CONTENTS) Tj ET
-BT /F1 10.6 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 313.0 Tm (1. Historical chronology) Tj ET
-BT /F1 10.6 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 290.0 Tm (2. Original on-disk architecture) Tj ET
-BT /F1 10.6 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 267.0 Tm (3. Allocation and directories) Tj ET
-BT /F1 10.6 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 244.0 Tm (4. Integrity and recovery) Tj ET
-BT /F1 10.6 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 221.0 Tm (5. Design rationale and limitations) Tj ET
-BT /F1 10.6 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 198.0 Tm (6. InfiltratorOS integration boundary) Tj ET
-endstream
-endobj
-34 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 35 0 R >>
-endobj
-35 0 obj
-<< /Length 1970 >>
-stream
-0.06 0.13 0.22 rg 0 750 595 92 re f
-0.03 0.53 0.58 rg 50 747 120 4 re f
-0.7 0.8 0.85 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.60 0.85 0.90 rg 1 0 0 1 50 803.0 Tm (INFILTRATOR / ORIGINAL FILESYSTEM TECHNICAL REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 774.0 Tm (XFS - SGI high-performance filesystem) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (Filesystem-XFS | Format history, physical design and references) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 509 34.0 Tm (PAGE 02) Tj ET
-BT /F2 14 Tf 0.01 0.43 0.49 rg 1 0 0 1 50 713.0 Tm (HISTORICAL CHRONOLOGY) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 679.0 Tm (Silicon Graphics developed XFS in the 1990s for the high-throughput storage demands of IRIX) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 662.0 Tm (workstations and servers. It became an important filesystem in the later IRIX 5 era and was) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 645.0 Tm (subsequently released as open source and ported to Linux, reaching mainline Linux in the) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 628.0 Tm (2001 period. The original motivation was scalable large files, streaming I/O and concurrent) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 611.0 Tm (use on large disk systems.) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 582.0 Tm (XFS has continued to evolve in Linux through improved allocation, metadata checksums,) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 565.0 Tm (reflinks, reverse mapping and other features. Newer on-disk versions and feature bits may) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 548.0 Tm (change structural details. A historical IRIX-era XFS volume and a modern Linux-formatted) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 531.0 Tm (XFS filesystem share architectural roots but not necessarily an identical set of supported) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 514.0 Tm (metadata facilities.) Tj ET
-endstream
-endobj
-36 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 37 0 R >>
-endobj
-37 0 obj
-<< /Length 1937 >>
-stream
-0.06 0.13 0.22 rg 0 750 595 92 re f
-0.03 0.53 0.58 rg 50 747 120 4 re f
-0.7 0.8 0.85 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.60 0.85 0.90 rg 1 0 0 1 50 803.0 Tm (INFILTRATOR / ORIGINAL FILESYSTEM TECHNICAL REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 774.0 Tm (XFS - SGI high-performance filesystem) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (Filesystem-XFS | Format history, physical design and references) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 509 34.0 Tm (PAGE 03) Tj ET
-BT /F2 14 Tf 0.01 0.43 0.49 rg 1 0 0 1 50 713.0 Tm (ORIGINAL ON-DISK ARCHITECTURE) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 679.0 Tm (XFS divides the volume into allocation groups \(AGs\), each with its own metadata that allows) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 662.0 Tm (parallel free-space and inode allocation. AG headers, superblocks and B+trees represent) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 645.0 Tm (free extents and per-group inode state. Inode forks describe regular data and) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 628.0 Tm (extended-attribute mappings, and files use extent-based allocation rather than a global FAT) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 611.0 Tm (chain.) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 582.0 Tm (Directory formats vary with directory size, from compact inode-resident forms to block and) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 565.0 Tm (B+tree arrangements. The on-disk B+tree families have separate purposes: free-space by) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 548.0 Tm (block or length, inode indexing, extent mappings and newer reverse-mapping/reference-count) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 531.0 Tm (trees where enabled. Parsers must interpret AG-relative versus filesystem-wide addresses) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 514.0 Tm (correctly.) Tj ET
-endstream
-endobj
-38 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 39 0 R >>
-endobj
-39 0 obj
-<< /Length 2021 >>
-stream
-0.06 0.13 0.22 rg 0 750 595 92 re f
-0.03 0.53 0.58 rg 50 747 120 4 re f
-0.7 0.8 0.85 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.60 0.85 0.90 rg 1 0 0 1 50 803.0 Tm (INFILTRATOR / ORIGINAL FILESYSTEM TECHNICAL REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 774.0 Tm (XFS - SGI high-performance filesystem) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (Filesystem-XFS | Format history, physical design and references) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 509 34.0 Tm (PAGE 04) Tj ET
-BT /F2 14 Tf 0.01 0.43 0.49 rg 1 0 0 1 50 713.0 Tm (ALLOCATION AND DIRECTORIES) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 679.0 Tm (Allocation groups make it possible to scale concurrent writers and keep locality within) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 662.0 Tm (large filesystems. The allocator searches free-space structures and chooses extents based) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 645.0 Tm (on size, locality and current fragmentation. Delayed allocation and speculative) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 628.0 Tm (preallocation can improve sequential performance. Extent maps may later change through) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 611.0 Tm (defragmentation or reflink copy-on-write operations on formats that support them.) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 582.0 Tm (Directory entries map names to inodes, but the representation is not identical for all) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 565.0 Tm (directory sizes. Extended attributes are managed in inode forks or separate blocks) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 548.0 Tm (according to storage needs. Inode generation numbers and allocation records are important) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 531.0 Tm (for safely interpreting stale references. Some metadata structures have physical checksum) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 514.0 Tm (fields in modern CRC-enabled formats.) Tj ET
-endstream
-endobj
-40 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 41 0 R >>
-endobj
-41 0 obj
-<< /Length 1858 >>
-stream
-0.06 0.13 0.22 rg 0 750 595 92 re f
-0.03 0.53 0.58 rg 50 747 120 4 re f
-0.7 0.8 0.85 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.60 0.85 0.90 rg 1 0 0 1 50 803.0 Tm (INFILTRATOR / ORIGINAL FILESYSTEM TECHNICAL REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 774.0 Tm (XFS - SGI high-performance filesystem) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (Filesystem-XFS | Format history, physical design and references) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 509 34.0 Tm (PAGE 05) Tj ET
-BT /F2 14 Tf 0.01 0.43 0.49 rg 1 0 0 1 50 713.0 Tm (INTEGRITY AND RECOVERY) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 679.0 Tm (XFS uses metadata journalling to make multi-record metadata updates recoverable. The log) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 662.0 Tm (records intents and changes required to bring the filesystem back to a consistent) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 645.0 Tm (transaction boundary after an unexpected shutdown. It does not normally journal all user) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 628.0 Tm (file data. Recovery should replay the log when appropriate; offline repair tools inspect) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 611.0 Tm (wider space-management, inode and namespace consistency.) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 582.0 Tm (XFS metadata CRCs and owner/identity checks strengthen corruption detection on newer format) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 565.0 Tm (versions. Repairing an in-use XFS volume independently is unsafe. Logs and deferred) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 548.0 Tm (operations make recovery state dependent on more than the superblock, and a forceful log) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 531.0 Tm (discard can lose recoverable metadata changes.) Tj ET
-endstream
-endobj
-42 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 43 0 R >>
-endobj
-43 0 obj
-<< /Length 1855 >>
-stream
-0.06 0.13 0.22 rg 0 750 595 92 re f
-0.03 0.53 0.58 rg 50 747 120 4 re f
-0.7 0.8 0.85 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.60 0.85 0.90 rg 1 0 0 1 50 803.0 Tm (INFILTRATOR / ORIGINAL FILESYSTEM TECHNICAL REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 774.0 Tm (XFS - SGI high-performance filesystem) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (Filesystem-XFS | Format history, physical design and references) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 509 34.0 Tm (PAGE 06) Tj ET
-BT /F2 14 Tf 0.01 0.43 0.49 rg 1 0 0 1 50 713.0 Tm (DESIGN RATIONALE AND LIMITATIONS) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 679.0 Tm (XFS favours scaling and high throughput rather than minimising bookkeeping for tiny) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 662.0 Tm (removable volumes. Allocation groups, B+trees and extent descriptors reduce global) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 645.0 Tm (bottlenecks but increase implementation complexity. Relocation of individual data extents) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 628.0 Tm (is possible under correctly qualified mechanisms, yet XFS's internal allocator retains) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 611.0 Tm (authority over future placement.) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 582.0 Tm (The extent of shrink, copy-on-write, reflink, quota or realtime-device capabilities depends) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 565.0 Tm (on version and implementation. No external utility should claim general crash-safe physical) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 548.0 Tm (placement merely because it has produced a contiguous list of sectors. XFS is fundamentally) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 531.0 Tm (a metadata-rich Unix filesystem, not a FAT variant.) Tj ET
-endstream
-endobj
-44 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 45 0 R >>
-endobj
-45 0 obj
-<< /Length 1689 >>
-stream
-0.06 0.13 0.22 rg 0 750 595 92 re f
-0.03 0.53 0.58 rg 50 747 120 4 re f
-0.7 0.8 0.85 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.60 0.85 0.90 rg 1 0 0 1 50 803.0 Tm (INFILTRATOR / ORIGINAL FILESYSTEM TECHNICAL REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 774.0 Tm (XFS - SGI high-performance filesystem) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (Filesystem-XFS | Format history, physical design and references) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 509 34.0 Tm (PAGE 07) Tj ET
-BT /F2 14 Tf 0.01 0.43 0.49 rg 1 0 0 1 50 713.0 Tm (INFILTRATOROS INTEGRATION BOUNDARY) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 679.0 Tm (XFS.so must parse actual allocation-group and B+tree semantics and refuse unknown) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 662.0 Tm (incompatibility features. Its capability declarations and any kernel module qualification) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 645.0 Tm (are implementation facts, separate from SGI's original design. An analysis-only support) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 628.0 Tm (level must never be presented as full writable mounting.) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 599.0 Tm (Source documentation and Linux on-disk definitions should be consulted when validating) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 582.0 Tm (extent maps, directory formats, CRC fields and log state. The conceptual media map is not a) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 565.0 Tm (binary layout; every allocation group's real offsets and geometry come from the filesystem) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 548.0 Tm (superblock.) Tj ET
-endstream
-endobj
-46 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 47 0 R >>
-endobj
-47 0 obj
-<< /Length 2205 >>
-stream
-0.06 0.13 0.22 rg 0 750 595 92 re f
-0.03 0.53 0.58 rg 50 747 120 4 re f
-0.7 0.8 0.85 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.60 0.85 0.90 rg 1 0 0 1 50 803.0 Tm (INFILTRATOR / ORIGINAL FILESYSTEM TECHNICAL REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 774.0 Tm (XFS - SGI high-performance filesystem) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (Filesystem-XFS | Format history, physical design and references) Tj ET
-BT /F1 8 Tf 0.33 0.40 0.44 rg 1 0 0 1 509 34.0 Tm (PAGE 08) Tj ET
-BT /F2 14 Tf 0.01 0.43 0.49 rg 1 0 0 1 50 713.0 Tm (SOURCES AND PRIMARY REFERENCES) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 679.0 Tm (The documents below are the historical and engineering reference points used for this) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 662.0 Tm (guide. Where an on-media field or feature flag is ambiguous, consult the original format) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 645.0 Tm (documentation and its version-specific implementation notes before interpreting or changing) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 628.0 Tm (media.) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 599.0 Tm (1. Linux kernel: The SGI XFS Filesystem) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 570.0 Tm (https://www.kernel.org/doc/html/latest/admin-guide/xfs.html) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 541.0 Tm (2. XFS project technical documentation) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 512.0 Tm (https://xfs.wiki.kernel.org/) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 483.0 Tm (3. SGI IRIX historical platform timeline) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 454.0 Tm (https://archive.irixnet.org/sgistuff/software/irixintro/index.html) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 425.0 Tm (The InfiltratorOS shared-object module, optional kernel adapter, native builder and) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 408.0 Tm (release-specific tests are a separate implementation. A successful document build or) Tj ET
-BT /F1 10.15 Tf 0.08 0.15 0.24 rg 1 0 0 1 50 391.0 Tm (package installation does not qualify physical writes, recovery, kernel mounting or boot.) Tj ET
-endstream
-endobj
-48 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 49 0 R >>
-endobj
-49 0 obj
-<< /Length 1863 >>
-stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.04 0.52 0.60 rg 50 747 114 5 re f
-0.76 0.82 0.86 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.65 0.89 0.92 rg 1 0 0 1 50 802.0 Tm (INFILTRATOR / PRIMARY FORMAT DESIGN APPENDIX) Tj ET
-BT /F2 17 Tf 1 1 1 rg 1 0 0 1 50 773.0 Tm (XFS / technical detail) Tj ET
-BT /F1 8 Tf 0.31 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (XFS / original filesystem research) Tj ET
-BT /F1 8 Tf 0.31 0.40 0.44 rg 1 0 0 1 510 34.0 Tm (PAGE 09) Tj ET
-BT /F2 14 Tf 0.03 0.44 0.51 rg 1 0 0 1 50 704.0 Tm (ON-DISK FIELD AND STRUCTURE INVENTORY) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 666.0 Tm (Format-specific field names and meanings are summarised below; where applicable the) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 648.0 Tm (original specification defines exact endianness, offsets, checksums and format-revision) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 630.0 Tm (limits.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 600.0 Tm (1. Primary superblock and allocation group headers.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 570.0 Tm (2. AGF/AGI metadata: free space and inode allocation summaries.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 540.0 Tm (3. Free-space B+trees by physical address and extent length.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 510.0 Tm (4. Inode forks: data extents, attribute extents or indexed mappings.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 480.0 Tm (5. Directory block/leaf/node formats vary with directory size.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 450.0 Tm (6. Log records and deferred intents: metadata crash recovery.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 420.0 Tm (7. CRC-enabled formats: owner, UUID and metadata validation.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 390.0 Tm (8. Modern versions: refcount and reverse mapping trees.) Tj ET
-endstream
-endobj
-50 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 51 0 R >>
-endobj
-51 0 obj
-<< /Length 1711 >>
-stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.04 0.52 0.60 rg 50 747 114 5 re f
-0.76 0.82 0.86 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.65 0.89 0.92 rg 1 0 0 1 50 802.0 Tm (INFILTRATOR / PRIMARY FORMAT DESIGN APPENDIX) Tj ET
-BT /F2 17 Tf 1 1 1 rg 1 0 0 1 50 773.0 Tm (XFS / technical detail) Tj ET
-BT /F1 8 Tf 0.31 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (XFS / original filesystem research) Tj ET
-BT /F1 8 Tf 0.31 0.40 0.44 rg 1 0 0 1 510 34.0 Tm (PAGE 10) Tj ET
-BT /F2 14 Tf 0.03 0.44 0.51 rg 1 0 0 1 50 704.0 Tm (HISTORICAL FORMAT DEVELOPMENT) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 666.0 Tm (Selected design milestones explain why this format acquired its present layout. Dates) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 648.0 Tm (refer to historical format or implementation changes, not InfiltratorOS releases.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 618.0 Tm (1. 1990s: SGI develops XFS for IRIX large-file workloads.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 588.0 Tm (2. Later 1990s: XFS matures on SGI servers and workstations.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 558.0 Tm (3. 2001 period: Linux mainline adopts open-source XFS.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 528.0 Tm (4. 2010s onward: modern CRC, reflink and reverse-map features appear.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 498.0 Tm (Important historical distinction: newly introduced driver features are not necessarily) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 480.0 Tm (changes to the original on-disk format. Read the version or feature bits rather than) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 462.0 Tm (assuming current software support defines historic media.) Tj ET
-endstream
-endobj
-52 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 53 0 R >>
-endobj
-53 0 obj
-<< /Length 1908 >>
-stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.04 0.52 0.60 rg 50 747 114 5 re f
-0.76 0.82 0.86 RG 0.7 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.65 0.89 0.92 rg 1 0 0 1 50 802.0 Tm (INFILTRATOR / PRIMARY FORMAT DESIGN APPENDIX) Tj ET
-BT /F2 17 Tf 1 1 1 rg 1 0 0 1 50 773.0 Tm (XFS / technical detail) Tj ET
-BT /F1 8 Tf 0.31 0.40 0.44 rg 1 0 0 1 50 34.0 Tm (XFS / original filesystem research) Tj ET
-BT /F1 8 Tf 0.31 0.40 0.44 rg 1 0 0 1 510 34.0 Tm (PAGE 11) Tj ET
-BT /F2 14 Tf 0.03 0.44 0.51 rg 1 0 0 1 50 704.0 Tm (FORMAT VALIDATION AND RECOVERY INVARIANTS) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 666.0 Tm (A writable implementation must establish all of these conditions before modifying any) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 648.0 Tm (original-format media. These checks describe the minimum class of invariants, not proof) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 630.0 Tm (of complete recovery qualification.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 600.0 Tm (1. Verify allocation group geometry and AG-relative addressing.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 570.0 Tm (2. Check free extent trees agree with inode allocation.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 540.0 Tm (3. Interpret each directory format according to enabled version flags.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 510.0 Tm (4. Replay metadata log only through qualified recovery path.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 480.0 Tm (5. Never treat an XFS extent relocation as a permanent allocator reserve.) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 450.0 Tm (Forensic principle: use a separate verified image, retain original structures, and) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 432.0 Tm (report conflicting evidence instead of inventing a new supposedly clean filesystem) Tj ET
-BT /F1 10 Tf 0.08 0.16 0.24 rg 1 0 0 1 57 414.0 Tm (state.) Tj ET
-endstream
-endobj
-54 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 55 0 R >>
-endobj
-55 0 obj
-<< /Length 2661 >>
-stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-0.75 0.82 0.85 RG .7 w 50 49 m 545 49 l S
-BT /F2 9 Tf 0.62 0.88 0.91 rg 1 0 0 1 50 800 Tm (INFILTRATOR / ORIGINAL FILESYSTEM ENGINEERING APPENDIX) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 770 Tm (XFS / engineering detail) Tj ET
-BT /F1 8 Tf 0.3 0.39 0.42 rg 1 0 0 1 50 34 Tm (Original format research; consult primary references for normative fields) Tj ET
-BT /F1 8 Tf 0.3 0.39 0.42 rg 1 0 0 1 509 34 Tm (PAGE 12) Tj ET
-BT /F2 13.5 Tf 0.02 0.44 0.50 rg 1 0 0 1 50 710 Tm (DISK READ PATH / ENGINEERING NOTES) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 678 Tm (1. Read the XFS superblock to determine filesystem block and sector sizes,) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 661.5 Tm (allocation-group count, inode geometry, feature flags and log layout.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 635 Tm (2. Translate filesystem block numbers and allocation-group-relative references using the) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 618.5 Tm (superblock geometry; different XFS address types are not interchangeable.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 592 Tm (3. Inspect each allocation group's headers and free-space B+trees. Allocation groups) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 575.5 Tm (improve scalable allocation but also require per-group consistency.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 549 Tm (4. Locate inodes through the inode allocation B+tree and the inode-number encoding. Inode) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 532.5 Tm (records may contain local, extent or B+tree data forks.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 506 Tm (5. Decode directory structures by their format generation and size. A small local) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 489.5 Tm (directory can grow into block, leaf or node forms.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 463 Tm (6. Traverse file extent lists and B+tree roots while distinguishing delayed allocation in) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 446.5 Tm (memory from persistently allocated disk blocks.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 420 Tm (7. Examine the internal log or separately configured log device and journal sequence) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 403.5 Tm (before attempting metadata replay.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 377 Tm (8. For CRC-enabled v5 filesystems, validate the metadata header identities, owner) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 360.5 Tm (references and checksums; older v4 formats have different protection.) Tj ET
-endstream
-endobj
-56 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 57 0 R >>
-endobj
-57 0 obj
-<< /Length 2607 >>
-stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.01 0.52 0.56 rg 50 747 116 5 re f
-0.75 0.82 0.85 RG .7 w 50 49 m 545 49 l S
-BT /F2 9 Tf 0.62 0.88 0.91 rg 1 0 0 1 50 800 Tm (INFILTRATOR / ORIGINAL FILESYSTEM ENGINEERING APPENDIX) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 770 Tm (XFS / engineering detail) Tj ET
-BT /F1 8 Tf 0.3 0.39 0.42 rg 1 0 0 1 50 34 Tm (Original format research; consult primary references for normative fields) Tj ET
-BT /F1 8 Tf 0.3 0.39 0.42 rg 1 0 0 1 509 34 Tm (PAGE 13) Tj ET
-BT /F2 13.5 Tf 0.02 0.44 0.50 rg 1 0 0 1 50 710 Tm (VALIDATION, RECOVERY AND COMPATIBILITY) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 678 Tm (1. Verify allocation-group boundaries, free-space records and inode allocation state; a) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 661.5 Tm (consistent root superblock alone cannot certify every group.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 635 Tm (2. Check log identity and cycle ordering before recovery. External log devices must) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 618.5 Tm (belong to the same filesystem instance.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 592 Tm (3. Validate B+tree record ordering, sibling relationships and owner references where) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 575.5 Tm (supported; damaged traversal can otherwise create false free-space claims.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 549 Tm (4. Never treat speculative preallocation or an unwritten extent as already initialized) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 532.5 Tm (user content.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 506 Tm (5. Respect XFS version and feature flags, including metadata CRC, reflink and reverse) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 489.5 Tm (mapping support, when decoding structures.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 463 Tm (6. Do not shrink or rewrite a volume merely by changing its nominal block count:) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 446.5 Tm (allocation groups and on-disk geometry must be reconstructed by qualified tools.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 420 Tm (7. Use a preserved copy for xfs_repair-style investigation. Log handling and destructive) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 403.5 Tm (metadata rebuilds are distinct stages.) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 377 Tm (8. Historical SGI XFS design and modern Linux extensions must be separated when) Tj ET
-BT /F1 10 Tf 0.09 0.16 0.24 rg 1 0 0 1 55 360.5 Tm (attributing features to a particular disk format revision.) Tj ET
-endstream
-endobj
-58 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 59 0 R >>
-endobj
-59 0 obj
-<< /Length 2625 >>
-stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.04 0.54 0.60 rg 50 747 115 4 re f
-0.78 0.82 0.86 RG 0.6 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.62 0.86 0.90 rg 1 0 0 1 50 801 Tm (INFILTRATOR / IMPLEMENTATION REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 771 Tm (XFS / Common V2 provider) Tj ET
-BT /F1 8 Tf 0.34 0.40 0.44 rg 1 0 0 1 50 34 Tm (Implementation appendix / source revision f91c0ee203d8) Tj ET
-BT /F1 8 Tf 0.34 0.40 0.44 rg 1 0 0 1 505 34 Tm (PAGE 14) Tj ET
-BT /F2 13 Tf 0.02 0.45 0.50 rg 1 0 0 1 50 710 Tm (1. PURPOSE AND FORMAT SCOPE) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 686 Tm (XFS v4 and v5, with native allocation-group structures. This repository) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 671 Tm (owns the format-specific implementation of XFS.so for InfiltratorOS.) Tj ET
-BT /F2 13 Tf 0.02 0.45 0.50 rg 1 0 0 1 50 641 Tm (2. ON-DISK ARCHITECTURE AND INVARIANTS) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 617 Tm (Validate superblock geometry, v5 CRC32C, internal log state and inode) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 602 Tm (allocation through the inode B+tree. Shortform and data directories,) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 587 Tm (direct extents and bmap trees govern mapping. Sparse and unwritten ranges) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 572 Tm (must not expose stale media contents. Reject unsupported log formats;) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 557 Tm (ordinary XFS file data has no native checksum.) Tj ET
-BT /F2 13 Tf 0.02 0.45 0.50 rg 1 0 0 1 50 527 Tm (3. COMMON V2 IMPLEMENTATION AND CAPABILITIES) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 503 Tm (Common V2 declares probe, mount, stat, list and read, with VOLUME format) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 488 Tm (in hosted scope. The embedded reader uses the same namespace) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 473 Tm (implementation. Qualification includes 4Kn transfers and contradictory) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 458 Tm (geometry with recomputed metadata checksums. The canonical entry point is) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 443 Tm (infiltrator_filesystem_api_v2. Consumers must negotiate the actual profile) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 428 Tm (and operation masks and use bounded, partition-relative host I/O. A) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 413 Tm (source-level callback does not by itself establish that every format) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 398 Tm (variant or host profile is qualified.) Tj ET
-endstream
-endobj
-60 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 61 0 R >>
-endobj
-61 0 obj
-<< /Length 3654 >>
-stream
-0.05 0.13 0.22 rg 0 749 595 93 re f
-0.04 0.54 0.60 rg 50 747 115 4 re f
-0.78 0.82 0.86 RG 0.6 w 50 50 m 545 50 l S
-BT /F2 9 Tf 0.62 0.86 0.90 rg 1 0 0 1 50 801 Tm (INFILTRATOR / IMPLEMENTATION REFERENCE) Tj ET
-BT /F2 19 Tf 1 1 1 rg 1 0 0 1 50 771 Tm (XFS / Common V2 provider) Tj ET
-BT /F1 8 Tf 0.34 0.40 0.44 rg 1 0 0 1 50 34 Tm (Implementation appendix / source revision f91c0ee203d8) Tj ET
-BT /F1 8 Tf 0.34 0.40 0.44 rg 1 0 0 1 505 34 Tm (PAGE 15) Tj ET
-BT /F2 13 Tf 0.02 0.45 0.50 rg 1 0 0 1 50 710 Tm (4. INTEGRITY, MUTATION, ALLOCATION AND RECOVERY) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 686 Tm (External logs, realtime volumes, ASCII case-insensitive lookup, symlink) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 671 Tm (traversal and journal replay are outside the documented reader scope.) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 656 Tm (General writable namespace and relocation remain separate qualifications.) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 641 Tm (For destructive operations, require the applicable exclusive writable) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 626 Tm (host, durability contract and format-specific validation. Never silently) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 611 Tm (substitute a kernel or FUSE driver or treat a rejected or unavailable) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 596 Tm (operation as success. Preserve original disk-format semantics; relocation) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 581 Tm (and recovery are separate from ordinary file I/O.) Tj ET
-BT /F2 13 Tf 0.02 0.45 0.50 rg 1 0 0 1 50 551 Tm (5. BUILD, INSTALLATION AND RELEASE) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 527 Tm (The target installation is /System/Filesystems/XFS.so and) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 512 Tm (/System/Resources/Documentation/Filesystem-XFS.pdf. The project release) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 497 Tm (policy is a portable amd64 DEB and a CPU-native source-first RUN, with) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 482 Tm (GitHub's automatic source archive; do not treat this policy statement as) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 467 Tm (verification of the current installer payload. The release workflow is the) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 452 Tm (authoritative executable build and package specification. Historical) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 437 Tm (adapters and test artifacts are not additional production filesystem) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 422 Tm (authorities.) Tj ET
-BT /F2 13 Tf 0.02 0.45 0.50 rg 1 0 0 1 50 392 Tm (6. QUALIFICATION AND LIMITATIONS) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 368 Tm (Recorded qualification workflow) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 353 Tm (\(https://github.com/Infiltrator-Projects/Filesystem-XFS/actions/runs/45520) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 338 Tm (161633\) | Current workflows) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 323 Tm (\(https://github.com/Infiltrator-Projects/Filesystem-XFS/actions?query=bran) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 308 Tm (ch%3Amain\). A successful workflow establishes the tested scope only, not) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 293 Tm (complete original-format parity, physical-media crash safety, or) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 278 Tm (production BOOT/kernel integration. Use disposable images for destructive) Tj ET
-BT /F1 10.2 Tf 0.07 0.16 0.23 rg 1 0 0 1 50 263 Tm (qualification.) Tj ET
+0.06 0.15 0.23 rg 0 768 595 74 re f
+1 1 1 rg BT /F2 10 Tf 43 811 Td (INFILTRATOR / FILESYSTEM ENGINEERING) Tj ET
+BT /F2 22 Tf 43 784 Td (XFS - technical reference) Tj ET
+0.08 0.14 0.20 rg BT /F2 15 Tf 43 736 Td (13. Journal, recovery and validation) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 706 Td (The internal or external XFS log stores metadata transactions and intent/completion) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 692 Td (items. Recovery must establish log head/tail, cycle and record sequence, validate) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 678 Td (committed items, and apply native buffer/inode replay and deferred operations) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 664 Td (before trusting a dirty namespace. CRC checks alone do not establish transaction) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 650 Td (consistency. A writer must reserve space and log capacity, copy verified data and) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 636 Td (publish changed mappings and allocator metadata under native transaction rules; do) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 622 Td (not retire blocks until recovery can safely establish ownership. Exact log record) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 608 Td (and item layouts require further dedicated source and crash-fixture validation.) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 594 Td (Sources: https://github.com/torvalds/linux/tree/v6.12/fs/xfs \(libxfs/xfs_format.h,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 580 Td (xfs_da_format.h, xfs_bmap_btree.c, xfs_bmap.c and log recovery sources\). Test) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 566 Td (independent xfsprogs images with v4/v5, sparse chunks, non-power-of-two AG size,) Tj ET
+0.08 0.14 0.20 rg BT /F3 10 Tf 43 552 Td (forks, unwritten extents, reflinks, multiple devices and interrupted relocation.) Tj ET
+0.2 0.3 0.4 rg BT /F1 9 Tf 43 32 Td (Historical development and engineering reference | 14) Tj ET
 endstream
 endobj
 xref
-0 62
+0 34
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000304 00000 n 
-0000000374 00000 n 
-0000000449 00000 n 
-0000000517 00000 n 
-0000000663 00000 n 
-0000001913 00000 n 
-0000002059 00000 n 
-0000003373 00000 n 
-0000003521 00000 n 
-0000004873 00000 n 
-0000005021 00000 n 
-0000006281 00000 n 
-0000006429 00000 n 
-0000007794 00000 n 
-0000007942 00000 n 
-0000009192 00000 n 
-0000009340 00000 n 
-0000010619 00000 n 
-0000010767 00000 n 
-0000012031 00000 n 
-0000012179 00000 n 
-0000013542 00000 n 
-0000013690 00000 n 
-0000015090 00000 n 
-0000015238 00000 n 
-0000016531 00000 n 
-0000016679 00000 n 
-0000018318 00000 n 
-0000018466 00000 n 
-0000019176 00000 n 
-0000019324 00000 n 
-0000022104 00000 n 
-0000022252 00000 n 
-0000024274 00000 n 
-0000024422 00000 n 
-0000026411 00000 n 
-0000026559 00000 n 
-0000028632 00000 n 
-0000028780 00000 n 
-0000030690 00000 n 
-0000030838 00000 n 
-0000032745 00000 n 
-0000032893 00000 n 
-0000034634 00000 n 
-0000034782 00000 n 
-0000037039 00000 n 
-0000037187 00000 n 
-0000039102 00000 n 
-0000039250 00000 n 
-0000041013 00000 n 
-0000041161 00000 n 
-0000043121 00000 n 
-0000043269 00000 n 
-0000045982 00000 n 
-0000046130 00000 n 
-0000048789 00000 n 
-0000048937 00000 n 
-0000051614 00000 n 
-0000051762 00000 n 
+0000000206 00000 n 
+0000000276 00000 n 
+0000000351 00000 n 
+0000000419 00000 n 
+0000000565 00000 n 
+0000002084 00000 n 
+0000002230 00000 n 
+0000004221 00000 n 
+0000004369 00000 n 
+0000006004 00000 n 
+0000006152 00000 n 
+0000007816 00000 n 
+0000007964 00000 n 
+0000009495 00000 n 
+0000009643 00000 n 
+0000011320 00000 n 
+0000011468 00000 n 
+0000012989 00000 n 
+0000013137 00000 n 
+0000014687 00000 n 
+0000014835 00000 n 
+0000016370 00000 n 
+0000016518 00000 n 
+0000018194 00000 n 
+0000018342 00000 n 
+0000020047 00000 n 
+0000020195 00000 n 
+0000021760 00000 n 
+0000021908 00000 n 
+0000024341 00000 n 
+0000024489 00000 n 
 trailer
-<< /Size 62 /Root 1 0 R >>
+<< /Size 34 /Root 1 0 R >>
 startxref
-55468
+26460
 %%EOF
